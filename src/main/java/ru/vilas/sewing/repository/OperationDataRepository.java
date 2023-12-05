@@ -8,6 +8,7 @@ import ru.vilas.sewing.model.OperationData;
 import ru.vilas.sewing.model.Task;
 import ru.vilas.sewing.model.User;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -30,9 +31,6 @@ public interface OperationDataRepository extends JpaRepository<OperationData, Lo
     void deleteByTaskAndSeamstressAndDate(Task task, User seamstress, LocalDate date);
 
 
-//    void updateCompletedOperationsByTaskAndSeamstressAndDate(
-//            Task task, User seamstress, LocalDate date, int completedOperations);
-
     @Modifying
     @Query("UPDATE OperationData od SET od.completedOperations = :completedOperations " +
             "WHERE od.task = :task AND od.seamstress = :seamstress AND od.date = :date")
@@ -41,5 +39,15 @@ public interface OperationDataRepository extends JpaRepository<OperationData, Lo
             @Param("seamstress") User seamstress,
             @Param("date") LocalDate date,
             @Param("completedOperations") int completedOperations);
+
+    @Query("SELECT COALESCE(SUM(od.completedOperations * t.costPerPiece), 0) " +
+            "FROM OperationData od " +
+            "JOIN od.task t " +
+            "WHERE od.seamstress.id = :seamstressId " +
+            "AND od.date BETWEEN :startDate AND :endDate")
+    BigDecimal calculateEarningsForSeamstressInPeriod(
+            @Param("seamstressId") Long seamstressId,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate);
 }
 

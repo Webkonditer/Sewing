@@ -9,9 +9,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import ru.vilas.sewing.model.Category;
 import ru.vilas.sewing.model.User;
 import ru.vilas.sewing.repository.UserRepository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -67,5 +69,9 @@ public class CustomUserDetailsService implements UserDetailsService {
             // Обработка случая, когда пользователь с заданным именем не найден
             throw new RuntimeException("User not found with username: " + username);
         }
+    }
+
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
     }
 }

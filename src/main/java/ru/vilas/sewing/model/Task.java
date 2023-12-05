@@ -3,6 +3,7 @@ package ru.vilas.sewing.model;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.Set;
 
 
@@ -17,7 +18,7 @@ public class Task {
     private Category category;
     private String equipment;
     private int timeInSeconds;
-    private double costPerPiece;
+    private BigDecimal costPerPiece;
     private int normPerShift;
     @OneToMany(mappedBy = "task")
     private Set<OperationData> operations;

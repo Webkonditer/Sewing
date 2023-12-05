@@ -1,19 +1,21 @@
 package ru.vilas.sewing.service;
 
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.vilas.sewing.dto.InOperationDto;
 import ru.vilas.sewing.dto.OperationDto;
+import ru.vilas.sewing.dto.SeamstressDto;
+import ru.vilas.sewing.model.Role;
 import ru.vilas.sewing.model.User;
 import ru.vilas.sewing.repository.OperationDataRepository;
 import ru.vilas.sewing.model.OperationData;
 import ru.vilas.sewing.model.Task;
 import ru.vilas.sewing.repository.TaskRepository;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -95,9 +97,29 @@ public class OperationDataServiceImpl implements OperationDataService {
 
             operationDataRepository.save(operationData);
         }
-
-
-        inoperationDtos.forEach(System.out::println);
-
     }
+
+    @Override
+    public BigDecimal getEarningsForSeamstressInPeriod(Long seamstressId, LocalDate startDate, LocalDate endDate){
+        return operationDataRepository.calculateEarningsForSeamstressInPeriod(seamstressId, startDate, endDate);
+    }
+
+    @Override
+    public List<SeamstressDto> getSeamstressDtosList(LocalDate startDate, LocalDate endDate){
+        List<User> users = customUserDetailsService.getAllUsers();
+        List<SeamstressDto> seamstressDtos = new ArrayList<>();
+        for (User user: users) {
+            if (user.getRoles().stream().anyMatch(role -> !role.getName().equals("ROLE_USER"))) {
+                continue;
+            }
+            SeamstressDto seamstressDto = new SeamstressDto();
+            seamstressDto.setSeamstressId(user.getId());
+            seamstressDto.setSeamstressName(user.getName());
+            seamstressDto.setEarnings(getEarningsForSeamstressInPeriod(user.getId(), startDate, endDate));
+            seamstressDtos.add(seamstressDto);
+        }
+
+        return seamstressDtos;
+    }
+
 }

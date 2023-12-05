@@ -5,6 +5,7 @@ import lombok.Data;
 import ru.vilas.sewing.model.Category;
 import ru.vilas.sewing.model.OperationData;
 
+import java.math.BigDecimal;
 import java.util.Set;
 
 
@@ -15,7 +16,7 @@ public class OperationDto {
     private String name;
     private String equipment;
     private int timeInSeconds;
-    private double costPerPiece;
+    private BigDecimal costPerPiece;
     private int normPerShift;
     private Long seamstressId;
     private int operations;
