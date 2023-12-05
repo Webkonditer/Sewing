@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/headFragment}"></head>
+
+<body>
+
+<div th:replace="~{fragments/headerFragment}"></div>
+
+<br /><br />
+
+<div class="container">
+    <h2>Отметить количество выполненных задач: </h2>
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">операция</th>
+            <th scope="col">t сек</th>
+            <th scope="col">р/шт</th>
+            <th scope="col">норма / смен</th>
+            <th scope="col">сегодня</th> <!-- Новый столбец -->
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="task, rowStat : ${tasks}">
+            <td th:text="${task.name}"></td>
+            <td th:text="${task.timeInSeconds}"></td>
+            <td th:text="${task.costPerPiece}"></td>
+            <td th:text="${task.normPerShift}"></td>
+            <td>
+                <input type="number" th:value="${task.operations}" name="operations"  style="width: 45px;">
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <button class="btn btn-primary" onclick="saveChanges()">Save</button>
+</div>
+
+<script>
+    function saveChanges() {
+        // Обработка сохранения изменений, например, отправка данных на сервер
+        alert("Changes saved!");
+    }
+</script>
+
+</body>
+</html>
