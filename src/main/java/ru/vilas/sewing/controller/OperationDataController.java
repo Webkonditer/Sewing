@@ -1,11 +1,13 @@
 package ru.vilas.sewing.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import ru.vilas.sewing.dto.InOperationDto;
 import ru.vilas.sewing.dto.OperationDto;
 import ru.vilas.sewing.model.Category;
 import ru.vilas.sewing.model.OperationData;
@@ -35,11 +37,11 @@ public class OperationDataController {
         this.сustomUserDetailsService = сustomUserDetailsService;
     }
 
-    @PostMapping("/save")
-    public String saveOperationData(@ModelAttribute OperationData operationData) {
-        operationDataService.saveOperationData(operationData);
-        return "redirect:/tasks/" + operationData.getTask().getId();
-    }
+//    @PostMapping("/save")
+//    public String saveOperationData(@ModelAttribute OperationData operationData) {
+//        operationDataService.saveOperationData(operationData);
+//        return "redirect:/tasks/" + operationData.getTask().getId();
+//    }
 
     @GetMapping("/{operationDataId}")
     public String getOperationDataDetails(@PathVariable Long operationDataId, Model model) {
@@ -51,12 +53,7 @@ public class OperationDataController {
     @GetMapping("/category/{categoryId}")
     public String getTasksForCategory(@PathVariable Long categoryId, Model model, Authentication authentication) {
 
-        //Authentication authentication = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        // Получаем объект User из объекта Authentication
-//        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        //System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!! " +
-          Object principal =  authentication.getPrincipal();
+        Object principal =  authentication.getPrincipal();
         String userName = null;
         if (principal instanceof UserDetails) {
             UserDetails userDetails = (UserDetails) principal;
@@ -69,10 +66,6 @@ public class OperationDataController {
         Category category = categoryService.getCategoryById(categoryId);
         List<Task> tasks = taskService.getTasksByCategory(category);
 
-//        List<OperationDto> operationDtos = new ArrayList<>();
-//        for (Task task : tasks) {
-//            operationDtos.add(operationDataService.convertToOperationDto(task, currentUserId));
-//        }
 
         List<OperationDto> operationDtos = tasks.stream()
                 .map(task -> operationDataService.convertToOperationDto(task, currentUserId))
@@ -81,5 +74,11 @@ public class OperationDataController {
         model.addAttribute("tasks", operationDtos);
 
         return "tasks";
+    }
+
+    @PostMapping("/save")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void saveOperations(@RequestBody List<InOperationDto> inOperationDtos) {
+        operationDataService.saveOrUpdateOperations(inOperationDtos);
     }
 }

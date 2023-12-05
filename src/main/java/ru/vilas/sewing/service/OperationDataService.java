@@ -1,5 +1,6 @@
 package ru.vilas.sewing.service;
 
+import ru.vilas.sewing.dto.InOperationDto;
 import ru.vilas.sewing.dto.OperationDto;
 import ru.vilas.sewing.model.OperationData;
 import ru.vilas.sewing.model.Task;
@@ -14,4 +15,6 @@ public interface OperationDataService {
     List<OperationData> getOperationDataByTask(Task task);
 
     OperationDto convertToOperationDto(Task task, Long seamstressId);
+
+    void saveOrUpdateOperations(List<InOperationDto> inoperationDtos);
 }

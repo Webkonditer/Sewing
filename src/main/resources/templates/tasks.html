@@ -22,13 +22,14 @@
         </tr>
         </thead>
         <tbody>
-        <tr th:each="task, rowStat : ${tasks}">
+        <tr th:each="task, rowStat : ${tasks}" th:data-task-id="${task.id}">
             <td th:text="${task.name}"></td>
             <td th:text="${task.timeInSeconds}"></td>
             <td th:text="${task.costPerPiece}"></td>
             <td th:text="${task.normPerShift}"></td>
             <td>
-                <input type="number" th:value="${task.operations}" name="operations"  style="width: 45px;">
+                <input type="number" th:value="${task.operations}" name="operations" style="width: 45px;"
+                       onchange="markChanges();">
             </td>
         </tr>
         </tbody>
@@ -36,11 +37,58 @@
     <button class="btn btn-primary" onclick="saveChanges()">Save</button>
 </div>
 
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script>
-    function saveChanges() {
-        // Обработка сохранения изменений, например, отправка данных на сервер
-        alert("Changes saved!");
+    var changesMade = false;
+
+    function markChanges() {
+        changesMade = true;
     }
+
+    // Сохранение изменений при нажатии кнопки Save
+    function saveChanges() {
+        if (!changesMade) {
+            alert('Нет внесенных изменений.');
+            return;
+        }
+
+        var data = [];
+        $('tbody tr').each(function () {
+            var row = $(this);
+            var taskId = row.data('task-id');
+            var operations = parseInt(row.find('input[name="operations"]').val(), 10);
+            data.push({taskId: taskId, operations: operations});
+        });
+
+        var csrfToken = $("meta[name='_csrf']").attr("content");
+        var csrfHeader = $("meta[name='_csrf_header']").attr("content");
+
+        $.ajax({
+            type: 'POST',
+            url: '/operations/save',
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader(csrfHeader, csrfToken);
+            },
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            success: function () {
+                alert('Изменения сохранены!');
+                changesMade = false; // Сброс флага изменений после успешного сохранения
+            },
+            error: function () {
+                alert('Error occurred while saving changes.');
+            }
+        });
+    }
+
+    // Предупреждение о несохраненных данных при попытке покинуть страницу
+    window.addEventListener('beforeunload', function (e) {
+        if (changesMade && !confirm('У вас есть несохраненные данные. Вы уверены, что хотите покинуть страницу?')) {
+            // Пользователь выбрал "Отмена", предотвращаем закрытие страницы
+            e.preventDefault();
+            e.returnValue = '';
+        }
+    });
 </script>
 
 </body>
