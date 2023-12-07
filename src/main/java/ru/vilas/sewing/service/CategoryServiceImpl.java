@@ -2,6 +2,7 @@ package ru.vilas.sewing.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.vilas.sewing.model.User;
 import ru.vilas.sewing.repository.CategoryRepository;
 import ru.vilas.sewing.model.Category;
 
@@ -25,5 +26,7 @@ public class CategoryServiceImpl implements CategoryService {
     public Category getCategoryById(Long id) {
         return categoryRepository.findById(id).orElse(null);
     }
+
+
 }
 

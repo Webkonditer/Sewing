@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/headFragment}"></head>
+
+<body>
+
+<div th:replace="~{fragments/headerFragment}"></div>
+
+<br/><br/>
+
+<div class="container">
+    <h2>Список швей</h2>
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">ФИО</th>
+            <th scope="col">Логин</th>
+            <th scope="col"></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="seamstress : ${seamstresses}">
+            <td th:text="${seamstress.name}"></td>
+            <td th:text="${seamstress.username}"></td>
+            <td>
+                <a th:href="@{/admin/seamstresses/edit/{id}(id=${seamstress.id})}" class="btn btn-warning btn-sm">
+                    Edit
+                </a>
+
+                <!-- Добавляем атрибут data-bs-toggle и data-bs-target для модального окна -->
+                <a href="#" class="btn btn-danger btn-sm"
+                   data-bs-toggle="modal"
+                   th:attr="data-bs-target='#deleteModal' + ${seamstress.id}">
+                    Del
+                </a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <!-- Кнопка для добавления новой швеи -->
+    <a th:href="@{/admin/seamstresses/new}" class="btn btn-primary">Добавить швею</a>
+</div>
+
+<!-- Модальное окно для подтверждения удаления -->
+<div th:each="seamstress : ${seamstresses}">
+    <div th:attr="id='deleteModal' + ${seamstress.id}" class="modal fade" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Подтверждение удаления</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Ваш текст подтверждения удаления -->
+                    Уверены, что хотите удалить швею?
+                </div>
+                <div class="modal-footer">
+                    <!-- Кнопка для подтверждения удаления -->
+                    <a th:href="@{/admin/seamstresses/delete/{id}(id=${seamstress.id})}" class="btn btn-danger">Удалить</a>
+                    <!-- Кнопка для закрытия модального окна -->
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Bootstrap CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" integrity="sha384-T6J5G4n2nDOF3t+ih0v9BDLQzav9F/n3f5Kflw5lCrj0iBQNsK/VdtUgQhFeM+Hg" crossorigin="anonymous">
+
+<!-- Bootstrap JS bundle (with Popper) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-eYsOYvFqYgRr5iR4GuZPQnE0p/N6q7bXytk/FLWL9bYsQ1pe9/gaXdBfQ/w82SnI" crossorigin="anonymous"></script>
+
+</body>
+</html>

@@ -1,15 +1,13 @@
 package ru.vilas.sewing.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.Set;
 
 @Setter
 @Getter
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
@@ -22,12 +20,13 @@ public class User {
     private String name;
     @Column(nullable = false, unique = true)
     private String username;
-    @Column(nullable = false, unique = true)
+    @Column(nullable = true)
     private String email;
     @Column(nullable = false)
     private String password;
 
-    @OneToMany(mappedBy = "seamstress")
+    @OneToMany(mappedBy = "seamstress", cascade = CascadeType.ALL)
+    @ToString.Exclude
     private Set<OperationData> operations;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
@@ -35,6 +34,7 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id")
     )
+    @ToString.Exclude
     private Set<Role> roles;
 }
 

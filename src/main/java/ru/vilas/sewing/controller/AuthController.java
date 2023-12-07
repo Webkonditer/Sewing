@@ -18,4 +18,10 @@ public class AuthController {
         return "login";
 
     }
+
+    // TODO: Реализовать этот метод
+    @GetMapping("")
+    public String redirectToTarget() {
+        return "redirect:/categories";
+    }
 }

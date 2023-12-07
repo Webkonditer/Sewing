@@ -34,8 +34,8 @@ public class SecurityConfig  {
         http//.csrf().disable()
                 .authorizeHttpRequests((authorize) ->
                         authorize
-                                .requestMatchers("h2/console/**", "/h2/**", "/css/**", "/js/**", "/images/**", "/webjars/**").permitAll()
                                 .requestMatchers("/categories/**").hasAnyRole("USER","ADMIN","DEMIGOD")
+                                .requestMatchers("/admin/**").hasAnyRole("ADMIN","DEMIGOD")
                                 .anyRequest().authenticated()
                 ).formLogin(
                         form -> form
