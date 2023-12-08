@@ -46,10 +46,33 @@ public class SeamstressController {
         }
     }
 
+    @PostMapping("/edit")
+    public String updateSeamstress(@ModelAttribute User user, Model model) {
+
+      try {
+            seamstressService.updateSeamstress(user);
+            return "redirect:/admin/seamstresses";
+        } catch (UsernameExistsException e) {
+            // Если пользователь с таким логином уже существует
+            //model.addAttribute("user", user);
+            model.addAttribute("seamstress", user);
+            model.addAttribute("error", "Пользователь с таким логином уже существует");
+            return "admin/editSeamstress"; // Возвращает на страницу добавления с сообщением об ошибке
+        }
+
+    }
+
     @GetMapping("/delete/{id}")
     public String deleteSeamstress(@PathVariable Long id) {
         seamstressService.deleteSeamstress(id);
         return "redirect:/admin/seamstresses";
+    }
+
+    @GetMapping("/edit/{id}")
+    public String editSeamstress(@PathVariable Long id, Model model) {
+        User seamstress = seamstressService.getSeamstressById(id);
+        model.addAttribute("seamstress", seamstress);
+        return "admin/editSeamstress";
     }
 }
 

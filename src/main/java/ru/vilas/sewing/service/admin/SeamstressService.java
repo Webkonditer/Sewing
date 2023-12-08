@@ -10,4 +10,8 @@ public interface SeamstressService {
     void saveSeamstress(User user);
 
     void deleteSeamstress(Long id);
+
+    User getSeamstressById(Long id);
+
+    void updateSeamstress(User user);
 }

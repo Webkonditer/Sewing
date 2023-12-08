@@ -11,6 +11,7 @@ import ru.vilas.sewing.repository.UserRepository;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -62,11 +63,40 @@ public class SeamstressServiceImpl implements SeamstressService {
 
 
     @Override
+    public void updateSeamstress(User newUser) {
+
+        System.out.println("!!!!!!!!!!!!!! " + newUser);
+        // Проверяем, существует ли швея с таким логином, исключая текущую швею
+        if (userRepository.existsByUsernameAndIdNot(newUser.getUsername(), newUser.getId())) {
+            throw new UsernameExistsException("Пользователь с логином " + newUser.getUsername() + " уже существует");
+        }
+        User oldUser = getSeamstressById(newUser.getId());
+        oldUser.setName(newUser.getName());
+        oldUser.setUsername(newUser.getUsername());
+        if (!Objects.equals(newUser.getPassword(), "")){
+            // Шифруем пароль перед сохранением в базу данных
+            oldUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
+        }
+
+        // Обновляем данные о швее
+        userRepository.save(oldUser);
+    }
+
+
+    @Override
     public void deleteSeamstress(Long id) {
         User user = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("User not found with id: " + id));
         user.getRoles().clear(); // Очищаем коллекцию ролей у пользователя
         userRepository.save(user); // Сохраняем пользователя без связей с ролями
         userRepository.deleteById(id);
     }
+
+    @Override
+    public User getSeamstressById(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + id));
+    }
+
+
 
 }

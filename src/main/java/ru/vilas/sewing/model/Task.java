@@ -14,12 +14,15 @@ public class Task {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
+
     @ManyToOne
+    @JoinColumn(name = "category_id", nullable = false)
     private Category category;
+
     private String equipment;
     private int timeInSeconds;
     private BigDecimal costPerPiece;
     private int normPerShift;
-    @OneToMany(mappedBy = "task")
+    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<OperationData> operations;
 }

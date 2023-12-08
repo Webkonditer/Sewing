@@ -10,42 +10,37 @@
 <br/><br/>
 
 <div class="container">
-    <h2>Список швей</h2>
+    <h2>Категории</h2>
     <table class="table">
         <thead>
         <tr>
-            <th scope="col">ФИО</th>
-            <th scope="col">Логин</th>
+            <th scope="col">Название категории</th>
             <th scope="col"></th>
         </tr>
         </thead>
         <tbody>
-        <tr th:each="seamstress : ${seamstresses}">
-            <td th:text="${seamstress.name}"></td>
-            <td th:text="${seamstress.username}"></td>
+        <tr th:each="category : ${categories}">
+            <td th:text="${category.name}"></td>
             <td>
-                <a th:href="@{/admin/seamstresses/edit/{id}(id=${seamstress.id})}" class="btn btn-warning btn-sm">
+                <a th:href="@{/admin/categories/edit/{id}(id=${category.id})}" class="btn btn-warning btn-sm">
                     Edit
                 </a>
-
                 <!-- Добавляем атрибут data-bs-toggle и data-bs-target для модального окна -->
                 <a href="#" class="btn btn-danger btn-sm"
                    data-bs-toggle="modal"
-                   th:attr="data-bs-target='#deleteModal' + ${seamstress.id}">
+                   th:attr="data-bs-target='#deleteModal' + ${category.id}">
                     Del
                 </a>
             </td>
         </tr>
         </tbody>
     </table>
-
-    <!-- Кнопка для добавления новой швеи -->
-    <a th:href="@{/admin/seamstresses/new}" class="btn btn-primary">Добавить швею</a>
+    <a th:href="@{/admin/categories/new}" class="btn btn-primary">Добавить новую категорию</a>
 </div>
 
 <!-- Модальное окно для подтверждения удаления -->
-<div th:each="seamstress : ${seamstresses}">
-    <div th:attr="id='deleteModal' + ${seamstress.id}" class="modal fade" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+<div th:each="category : ${categories}">
+    <div th:attr="id='deleteModal' + ${category.id}" class="modal fade" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -54,11 +49,11 @@
                 </div>
                 <div class="modal-body">
                     <!-- Ваш текст подтверждения удаления -->
-                    Уверены, что хотите удалить швею?
+                    Уверены, что хотите удалить категорию?
                 </div>
                 <div class="modal-footer">
                     <!-- Кнопка для подтверждения удаления -->
-                    <a th:href="@{/admin/seamstresses/delete/{id}(id=${seamstress.id})}" class="btn btn-danger">Удалить</a>
+                    <a th:href="@{/admin/categories/delete/{id}(id=${category.id})}" class="btn btn-danger">Удалить</a>
                     <!-- Кнопка для закрытия модального окна -->
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
                 </div>
