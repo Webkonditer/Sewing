@@ -7,6 +7,7 @@ import ru.vilas.sewing.model.Category;
 import ru.vilas.sewing.model.Task;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class TaskServiceImpl implements TaskService {
@@ -19,7 +20,10 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public List<Task> getTasksByCategory(Category category) {
-        return taskRepository.findByCategory(category);
+
+        return taskRepository.findByCategory(category).stream()
+                .filter(Task::getActive)
+                .collect(Collectors.toList());
     }
 
     @Override

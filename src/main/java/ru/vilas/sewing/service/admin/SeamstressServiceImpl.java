@@ -1,6 +1,7 @@
 package ru.vilas.sewing.service.admin;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.vilas.sewing.config.UsernameExistsException;
@@ -9,10 +10,7 @@ import ru.vilas.sewing.model.User;
 import ru.vilas.sewing.repository.RoleRepository;
 import ru.vilas.sewing.repository.UserRepository;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,9 +28,6 @@ public class SeamstressServiceImpl implements SeamstressService {
     @Override
     public List<User> getAllSeamstresses() {
         List<User> allUsers = userRepository.findAll();
-        //List<User> users = customUserDetailsService.getAllUsers();
-
-        allUsers.forEach(System.out::println);
         return allUsers.stream()
                 .filter(user -> user.getRoles().stream()
                         .anyMatch(role -> role.getName().equals("ROLE_USER")))
@@ -64,8 +59,6 @@ public class SeamstressServiceImpl implements SeamstressService {
 
     @Override
     public void updateSeamstress(User newUser) {
-
-        System.out.println("!!!!!!!!!!!!!! " + newUser);
         // Проверяем, существует ли швея с таким логином, исключая текущую швею
         if (userRepository.existsByUsernameAndIdNot(newUser.getUsername(), newUser.getId())) {
             throw new UsernameExistsException("Пользователь с логином " + newUser.getUsername() + " уже существует");
@@ -85,10 +78,26 @@ public class SeamstressServiceImpl implements SeamstressService {
 
     @Override
     public void deleteSeamstress(Long id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("User not found with id: " + id));
-        user.getRoles().clear(); // Очищаем коллекцию ролей у пользователя
-        userRepository.save(user); // Сохраняем пользователя без связей с ролями
-        userRepository.deleteById(id);
+        changeUserRole(id, 4L);
+    }
+
+
+    public void changeUserRole(Long userId, Long roleId) {
+        // Шаг 1: Получить пользователя из базы данных
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+
+        // Шаг 2: Получить новую роль из базы данных или создать новую роль
+        Role newRole = roleRepository.findById(roleId)
+                .orElseThrow(() -> new EntityNotFoundException("Role not found with id: " + roleId));
+
+        // Шаг 3: Обновить коллекцию ролей пользователя
+        Set<Role> roles = new HashSet<>();
+        roles.add(newRole);
+        user.setRoles(roles);
+
+        // Шаг 4: Сохранить обновленного пользователя в базу данных
+        userRepository.save(user);
     }
 
     @Override

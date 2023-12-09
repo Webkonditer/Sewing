@@ -3,10 +3,12 @@ package ru.vilas.sewing.service.admin;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import ru.vilas.sewing.model.Category;
+import ru.vilas.sewing.model.Task;
 import ru.vilas.sewing.model.User;
 import ru.vilas.sewing.repository.CategoryRepository;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class AdminCategoryServiceImpl implements AdminCategoryService {
@@ -36,11 +38,11 @@ public class AdminCategoryServiceImpl implements AdminCategoryService {
 
     @Override
     public void deleteCategory(Long id) {
-        Category category = categoryRepository.findById(id).orElseThrow(() -> new NotFoundException("Category not found with id: " + id));
-        category.getTasks().clear();
-        categoryRepository.save(category);
-        categoryRepository.deleteById(id);
+        Category category = categoryRepository.findById(id).orElse(null);
+        if(category != null){
+            category.setActive(false);
+            categoryRepository.save(category);
+        }
     }
-
 }
 
