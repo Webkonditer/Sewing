@@ -12,6 +12,7 @@ import ru.vilas.sewing.service.OperationDataService;
 import ru.vilas.sewing.service.TaskService;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/categories")
@@ -26,7 +27,10 @@ public class CategoryController {
 
     @GetMapping
     public String getAllCategories(Model model) {
-        List<Category> categories = categoryService.getAllCategories();
+        List<Category> categories = categoryService.getAllCategories()
+                .stream()
+                .filter(Category::isActive) // Фильтрация по активным категориям
+                .collect(Collectors.toList());
         model.addAttribute("categories", categories);
         model.addAttribute("requestURI", "/categories");
         return "categories";

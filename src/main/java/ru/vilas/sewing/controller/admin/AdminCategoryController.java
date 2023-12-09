@@ -7,6 +7,7 @@ import ru.vilas.sewing.model.Category;
 import ru.vilas.sewing.service.admin.AdminCategoryService;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/admin/categories")
@@ -21,7 +22,10 @@ public class AdminCategoryController {
 
     @GetMapping
     public String showCategories(Model model) {
-        List<Category> categories = adminCategoryService.getAllCategories();
+        List<Category> categories = adminCategoryService.getAllCategories()
+                .stream()
+                .filter(Category::isActive) // Фильтрация по активным категориям
+                .collect(Collectors.toList());
         model.addAttribute("categories", categories);
         return "admin/categoryList";
     }

@@ -13,6 +13,7 @@ public class Task {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String name;
 
     @ManyToOne
@@ -20,9 +21,15 @@ public class Task {
     private Category category;
 
     private String equipment;
+
     private int timeInSeconds;
+
     private BigDecimal costPerPiece;
+
     private int normPerShift;
+
     @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<OperationData> operations;
+
+    private Boolean active = true;
 }
