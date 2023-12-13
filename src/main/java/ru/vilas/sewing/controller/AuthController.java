@@ -20,4 +20,9 @@ public class AuthController {
     public String redirectToTarget() {
         return "redirect:/categories";
     }
+
+    @GetMapping("/index")
+    public String redirectFromIndex() {
+        return "redirect:/categories";
+    }
 }
