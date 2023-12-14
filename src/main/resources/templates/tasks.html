@@ -29,7 +29,7 @@
             <td th:text="${task.normPerShift}"></td>
             <td>
                 <input type="number" th:value="${task.operations}" name="operations" style="width: 45px;"
-                       onchange="markChanges();">
+                       onchange="markChanges(); ; checkMaxValue(this);">
             </td>
         </tr>
         </tbody>
@@ -37,9 +37,38 @@
     <button class="btn btn-primary" onclick="saveChanges()">Save</button>
 </div>
 
+<!-- Модальное окно для сообщения об успешном сохранении -->
+<div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="successModalLabel">Успех</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Изменения успешно сохранены!
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script>
     var changesMade = false;
+
+    // Функция для проверки максимального допустимого числа
+    function checkMaxValue(input) {
+        var maxValue = 999;
+        var value = parseInt(input.value, 10);
+
+        if (isNaN(value) || value > maxValue) {
+            alert('Максимальное допустимое число - ' + maxValue);
+            input.value = maxValue; // Устанавливаем максимальное значение
+        }
+    }
 
     function markChanges() {
         changesMade = true;
@@ -72,11 +101,11 @@
             contentType: 'application/json',
             data: JSON.stringify(data),
             success: function () {
-                alert('Изменения сохранены!');
+                $('#successModal').modal('show');
                 changesMade = false; // Сброс флага изменений после успешного сохранения
             },
             error: function () {
-                alert('Error occurred while saving changes.');
+                alert('Произошла ошибка при сохранении изменений.');
             }
         });
     }
@@ -88,6 +117,16 @@
             e.preventDefault();
             e.returnValue = '';
         }
+    });
+
+    // Закрытие модального окна успеха по нажатию на кнопку OK
+    $('#successModal .btn-primary').click(function () {
+        $('#successModal').modal('hide');
+    });
+
+    // Закрытие модального окна успеха по закрытию окна (крестик)
+    $('#successModal').on('hidden.bs.modal', function () {
+        // Выполните необходимые действия при закрытии модального окна
     });
 </script>
 
