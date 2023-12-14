@@ -15,6 +15,7 @@ import ru.vilas.sewing.repository.TaskRepository;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -115,11 +116,45 @@ public class OperationDataServiceImpl implements OperationDataService {
             SeamstressDto seamstressDto = new SeamstressDto();
             seamstressDto.setSeamstressId(user.getId());
             seamstressDto.setSeamstressName(user.getName());
-            seamstressDto.setEarnings(getEarningsForSeamstressInPeriod(user.getId(), startDate, endDate));
+            List<BigDecimal> earnings = getEarningsByDateRange(user.getId(), startDate, endDate);
+            seamstressDto.setEarnings(earnings);
+            seamstressDto.setAmountOfEarnings(earnings.stream().reduce(BigDecimal.ZERO, BigDecimal::add));
             seamstressDtos.add(seamstressDto);
         }
 
         return seamstressDtos;
     }
+
+    @Override
+    public List<String> getDatesInPeriod(LocalDate startDate, LocalDate endDate) {
+        List<String> result = new ArrayList<>();
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy E"); // Формат даты и дня недели
+
+        LocalDate currentDate = startDate;
+        while (!currentDate.isAfter(endDate)) {
+            String formattedDate = currentDate.format(formatter);
+            result.add(formattedDate);
+
+            currentDate = currentDate.plusDays(1);
+        }
+
+        return result;
+    }
+
+    private List<BigDecimal> getEarningsByDateRange(Long seamstressId, LocalDate startDate, LocalDate endDate) {
+        List<BigDecimal> earnings = new ArrayList<>();
+        LocalDate currentDate = startDate;
+        while (!currentDate.isAfter(endDate)) {
+            BigDecimal earning = operationDataRepository.getEarningsByDate(seamstressId, currentDate);
+            earnings.add(earning);
+
+            currentDate = currentDate.plusDays(1);
+        }
+
+        return earnings;
+    }
+
+
 
 }

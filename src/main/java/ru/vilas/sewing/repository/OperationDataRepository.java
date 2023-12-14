@@ -49,5 +49,25 @@ public interface OperationDataRepository extends JpaRepository<OperationData, Lo
             @Param("seamstressId") Long seamstressId,
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate);
+
+    @Query("SELECT COALESCE(SUM(od.completedOperations * t.costPerPiece), 0) " +
+            "FROM OperationData od " +
+            "JOIN od.task t " +
+            "WHERE od.seamstress.id = :seamstressId " +
+            "AND od.date BETWEEN :startDate AND :endDate " +
+            "GROUP BY od.date " +
+            "ORDER BY od.date")
+    List<BigDecimal> getEarningsByDateRange(@Param("seamstressId") Long seamstressId,
+                                            @Param("startDate") LocalDate startDate,
+                                            @Param("endDate") LocalDate endDate);
+    @Query("SELECT COALESCE(SUM(od.completedOperations * t.costPerPiece), 0) " +
+            "FROM OperationData od " +
+            "JOIN od.task t " +
+            "WHERE od.seamstress.id = :seamstressId " +
+            "AND od.date = :currentDate")
+    BigDecimal getEarningsByDate(@Param("seamstressId") Long seamstressId,
+                                 @Param("currentDate") LocalDate currentDate);
+
+
 }
 

@@ -24,4 +24,6 @@ public interface OperationDataService {
     BigDecimal getEarningsForSeamstressInPeriod(Long seamstressId, LocalDate startDate, LocalDate endDate);
 
     List<SeamstressDto> getSeamstressDtosList(LocalDate startDate, LocalDate endDate);
+
+    List<String> getDatesInPeriod(LocalDate startDate, LocalDate endDate);
 }

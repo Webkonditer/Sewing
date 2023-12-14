@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import ru.vilas.sewing.dto.SeamstressDto;
 import ru.vilas.sewing.service.OperationDataService;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -29,17 +30,22 @@ public class EarningsController {
             Model model) {
 
         // Если параметры не переданы, устанавливаем значения по умолчанию
-        if (startDate == null) {
-            startDate = LocalDate.now().minusMonths(1); //  1 месяц назад
-        }
 
         if (endDate == null) {
-            endDate = LocalDate.now();
+            endDate = LocalDate.now().with(DayOfWeek.THURSDAY);
         }
 
+        if (startDate == null) {
+            startDate = endDate.minusDays(6);
+        }
+
+        List<String> headers = operationDataService.getDatesInPeriod(startDate, endDate);
         List<SeamstressDto> seamstressDtos = operationDataService.getSeamstressDtosList(startDate, endDate);
 
+        seamstressDtos.forEach(seamstressDto -> System.out.println(seamstressDto.getEarnings()) );
+
         model.addAttribute("seamstressDtos", seamstressDtos);
+        model.addAttribute("tableHeaders", headers);
         model.addAttribute("startDate", startDate);
         model.addAttribute("endDate", endDate);
 

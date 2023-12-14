@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
 
 <head th:replace="~{fragments/headFragment}"></head>
 
@@ -33,13 +33,20 @@
         <thead>
         <tr>
             <th scope="col">Швея</th>
-            <th scope="col">Заработок</th>
+            <!-- Вставляем заголовки дат из tableHeaders -->
+            <th th:each="header : ${tableHeaders}" th:text="${header}"></th>
+            <!-- Добавляем заголовок "Сумма" -->
+            <th scope="col">Сумма</th>
         </tr>
         </thead>
         <tbody>
+        <!-- Для каждого швеи вставляем строку с именем, значениями заработка и суммой -->
         <tr th:each="seamstressDto : ${seamstressDtos}">
             <td th:text="${seamstressDto.seamstressName}"></td>
-            <td th:text="${seamstressDto.earnings}"></td>
+            <!-- Вставляем значения заработка для каждой даты -->
+            <td th:each="earning : ${seamstressDto.earnings}" th:text="${earning}"></td>
+            <!-- Вставляем значение суммы -->
+            <td th:text="${seamstressDto.amountOfEarnings}"></td>
         </tr>
         </tbody>
     </table>
