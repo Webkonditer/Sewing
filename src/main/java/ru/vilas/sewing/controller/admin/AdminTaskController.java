@@ -79,20 +79,10 @@ public class AdminTaskController {
             return "admin/addTask";
         }
         adminTaskService.saveTask(task);
-        // Остальная логика сохранения задачи
+
         return "redirect:/admin/tasks";
     }
 
-
-    // Редактирование задачи
-//    @GetMapping("/edit/{taskId}")
-//    public String showEditForm(@PathVariable Long taskId, Model model) {
-//        Task task = adminTaskService.getTaskById(taskId);
-//        List<Category> categories = adminCategoryService.getAllCategories();
-//        model.addAttribute("categories", categories);
-//        model.addAttribute("task", task);
-//        return "admin/taskForm";
-//    }
 
     @GetMapping("/edit/{taskId}")
     public String editTask(@PathVariable Long taskId, Model model) {
