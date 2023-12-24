@@ -83,7 +83,6 @@ public class AdminTaskController {
         return "redirect:/admin/tasks";
     }
 
-
     @GetMapping("/edit/{taskId}")
     public String editTask(@PathVariable Long taskId, Model model) {
         Task task = adminTaskService.getTaskById(taskId);
@@ -96,13 +95,6 @@ public class AdminTaskController {
         return "admin/editTask";
     }
 
-//    @PostMapping("/edit/{taskId}")
-//    public String updateTask(@PathVariable Long taskId, @ModelAttribute Task task) {
-//        task.setId(taskId);
-//        adminTaskService.saveTask(task);
-//        return "redirect:/admin/tasks";
-//    }
-
     @PostMapping("/edit/{taskId}")
     public String updateTask(@PathVariable Long taskId, @ModelAttribute Task updatedTask) {
         Task existingTask = adminTaskService.getTaskById(taskId);
@@ -113,6 +105,7 @@ public class AdminTaskController {
         existingTask.setCostPerPiece(updatedTask.getCostPerPiece());
         existingTask.setNormPerShift(updatedTask.getNormPerShift());
         existingTask.setCategory(updatedTask.getCategory());
+        existingTask.setTaskType(updatedTask.getTaskType());
 
         // Сохранение обновленной задачи
         adminTaskService.saveTask(existingTask);

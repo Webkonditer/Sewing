@@ -12,12 +12,12 @@
 <div class="container">
     <h2>Создать новую задачу</h2>
     <form th:action="@{/admin/tasks/new}" method="post" th:object="${task}">
-<!--        <div class="mb-3">-->
-<!--            <label for="category" class="form-label">Категория</label>-->
-<!--            <select class="form-control" id="category" name="category" th:field="*{category}" required>-->
-<!--                <option th:each="category : ${categories}" th:value="${category}" th:text="${category.name}"></option>-->
-<!--            </select>-->
-<!--        </div>-->
+        <div class="mb-3">
+            <label for="taskType" class="form-label">Тип задачи</label>
+            <select class="form-control" id="taskType" name="taskType" th:field="*{taskType}" required>
+                <option th:each="type : ${T(ru.vilas.sewing.dto.TaskTypes).values()}" th:value="${type}" th:text="${type.russianName}"></option>
+            </select>
+        </div>
         <div class="mb-3">
             <label for="category" class="form-label">Категория</label>
             <select class="form-control" id="category" name="category" th:field="*{category.id}" required>

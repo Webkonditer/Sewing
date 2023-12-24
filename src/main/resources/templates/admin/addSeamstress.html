@@ -24,7 +24,6 @@
             <label for="password" class="form-label">Пароль</label>
             <input type="password" class="form-control" id="password" name="password" required/>
         </div>
-
         <div class="mb-3">
             <label for="hourlyRate" class="form-label">Часовая ставка</label>
             <div class="input-group">
@@ -33,13 +32,6 @@
             </div>
             <small id="costPerPieceHelp" class="form-text text-muted">Введите часовую ставку в рублях (например, 220.34).</small>
         </div>
-
-<!--        <div class="mb-3">-->
-<!--            <label for="hourlyRate" class="form-label">Часовая ставка</label>-->
-<!--            <input type="text" class="form-control" id="hourlyRate" name="hourlyRate" th:value="${user != null ? user.hourlyRate : ''}" />-->
-<!--            <small class="text-muted">Введите часовую ставку, например, 500.80</small>-->
-<!--        </div>-->
-
         <div class="mb-3">
             <label for="salary" class="form-label">Оклад</label>
             <div class="input-group">
@@ -48,12 +40,6 @@
             </div>
             <small id="salaryHelp" class="form-text text-muted">Введите оклад в рублях (например, 10000,30).</small>
         </div>
-
-<!--        <div class="mb-3">-->
-<!--            <label for="salary" class="form-label">Оклад</label>-->
-<!--            <input type="text" class="form-control" id="salary" name="salary" th:value="${user != null ? user.salary : ''}" />-->
-<!--            <small class="text-muted">Введите сумму оклада, например, 5000.50</small>-->
-<!--        </div>-->
         <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
         <button type="submit" class="btn btn-primary">Добавить</button>
     </form>

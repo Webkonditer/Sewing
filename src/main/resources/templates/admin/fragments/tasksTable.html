@@ -3,6 +3,7 @@
     <thead>
     <tr>
 
+        <th scope="col">Тип задачи</th>
         <th scope="col">Название задачи</th>
         <th scope="col">t, сек</th>
         <th scope="col">руб/шт</th>
@@ -13,6 +14,7 @@
     <tbody>
     <tr th:each="task : ${tasks}">
 
+        <td th:text="${task.taskType.getRussianName()}"></td>
         <td th:text="${task.name}"></td>
         <td th:text="${task.timeInSeconds}"></td>
         <td th:text="${task.costPerPiece}"></td>

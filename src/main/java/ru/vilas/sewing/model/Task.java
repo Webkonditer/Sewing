@@ -2,6 +2,7 @@ package ru.vilas.sewing.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import ru.vilas.sewing.dto.TaskTypes;
 
 import java.math.BigDecimal;
 import java.util.Set;
@@ -13,6 +14,9 @@ public class Task {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Enumerated(EnumType.STRING)
+    TaskTypes taskType;
 
     private String name;
 

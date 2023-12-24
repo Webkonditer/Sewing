@@ -13,6 +13,12 @@
     <h2>Редактировать задачу</h2>
     <form th:action="@{'/admin/tasks/edit/' + ${task.id}}" method="post" th:object="${task}">
         <div class="mb-3">
+            <label for="taskType" class="form-label">Тип задачи</label>
+            <select class="form-control" id="taskType" name="taskType" th:field="*{taskType}" required>
+                <option th:each="type : ${T(ru.vilas.sewing.dto.TaskTypes).values()}" th:value="${type}" th:text="${type.russianName}" th:selected="${type eq task.taskType}"></option>
+            </select>
+        </div>
+        <div class="mb-3">
             <label for="category" class="form-label">Категория</label>
             <select class="form-control" id="category" name="category" th:field="*{category.id}" required>
                 <option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}" th:selected="${category.id eq task.category?.id}"></option>
