@@ -24,7 +24,7 @@
             <th scope="col">t сек</th>
             <th scope="col">р/шт</th>
             <th scope="col">норма / смен</th>
-            <th scope="col">сегодня</th> <!-- Новый столбец -->
+            <th scope="col">сделано шт.</th> <!-- Новый столбец -->
         </tr>
         </thead>
         <!-- Тело таблицы -->
@@ -85,7 +85,7 @@
         </thead>
         <!-- Тело таблицы -->
         <tbody>
-        <tr th:each="task : ${quantitativeTasks}" th:data-task-id="${task.id}">
+        <tr th:each="task : ${packagingTasks}" th:data-task-id="${task.id}">
             <!-- Здесь выводите данные для каждой задачи типа QUANTITATIVE -->
             <td th:text="${task.name}"></td>
             <td th:text="${task.costPerPiece}"></td>
