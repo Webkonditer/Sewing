@@ -52,6 +52,7 @@ public class OperationDataServiceImpl implements OperationDataService {
 
         OperationDto operationDto = new OperationDto();
         operationDto.setId(task.getId());
+        operationDto.setTaskType(task.getTaskType());
         operationDto.setName(task.getName());
         operationDto.setEquipment(task.getEquipment());
         operationDto.setTimeInSeconds(task.getTimeInSeconds());

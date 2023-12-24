@@ -17,8 +17,11 @@ import ru.vilas.sewing.service.CustomUserDetailsService;
 import ru.vilas.sewing.service.OperationDataService;
 import ru.vilas.sewing.service.TaskService;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static ru.vilas.sewing.dto.TaskTypes.*;
 
 @Controller
 @RequestMapping("/operations")
@@ -69,9 +72,18 @@ public class OperationDataController {
 
         List<OperationDto> operationDtos = tasks.stream()
                 .map(task -> operationDataService.convertToOperationDto(task, currentUserId))
-                .collect(Collectors.toList());
+                .toList();
 
-        model.addAttribute("tasks", operationDtos);
+        List<OperationDto> quantitativeTasks = operationDtos.stream().filter(t -> t.getTaskType().equals(QUANTITATIVE)).toList();
+        List<OperationDto> hourlyTasks = operationDtos.stream().filter(t -> t.getTaskType().equals(HOURLY)).toList();
+        List<OperationDto> packagingTasks = operationDtos.stream().filter(t -> t.getTaskType().equals(PACKAGING)).toList();
+
+        BigDecimal hourlyRate = сustomUserDetailsService.getCurrentUser().getHourlyRate();
+
+        model.addAttribute("quantitativeTasks", quantitativeTasks);
+        model.addAttribute("hourlyTasks", hourlyTasks);
+        model.addAttribute("packagingTasks", packagingTasks);
+        model.addAttribute("hourlyRate", hourlyRate);
 
         return "tasks";
     }

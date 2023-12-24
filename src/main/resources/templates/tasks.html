@@ -7,11 +7,17 @@
 
 <div th:replace="~{fragments/headerFragment}"></div>
 
-<br /><br />
+<br/><br/>
 
 <div class="container">
-    <h2>Отметить количество выполненных задач: </h2>
+    <h2>Отметить количество выполненных задач или часов: </h2>
+    <br>
+    <br>
+
+    <!-- Таблица для задач типа QUANTITATIVE -->
+    <h4>Количественные задачи:</h4>
     <table class="table">
+        <!-- Заголовки столбцов -->
         <thead>
         <tr>
             <th scope="col">операция</th>
@@ -21,19 +27,75 @@
             <th scope="col">сегодня</th> <!-- Новый столбец -->
         </tr>
         </thead>
+        <!-- Тело таблицы -->
         <tbody>
-        <tr th:each="task, rowStat : ${tasks}" th:data-task-id="${task.id}">
+        <tr th:each="task : ${quantitativeTasks}" th:data-task-id="${task.id}">
+            <!-- Здесь выводите данные для каждой задачи типа QUANTITATIVE -->
             <td th:text="${task.name}"></td>
             <td th:text="${task.timeInSeconds}"></td>
             <td th:text="${task.costPerPiece}"></td>
             <td th:text="${task.normPerShift}"></td>
             <td>
-                <input type="number" th:value="${task.operations}" name="operations" style="width: 45px;"
-                       onchange="markChanges(); ; checkMaxValue(this);">
+                <input type="number" th:value="${task.operations}" name="operations" style="width: 45px;" onchange="markChanges(); checkMaxValue(this);">
             </td>
         </tr>
         </tbody>
     </table>
+
+    <br>
+    <br>
+
+    <!-- Таблица для задач типа HOURLY -->
+    <h4>Почасовые задачи:</h4>
+    <table class="table">
+        <!-- Заголовки столбцов -->
+        <thead>
+        <tr>
+            <th scope="col">операция</th>
+            <th scope="col">часовая ставка</th>
+            <th scope="col">отработано часов</th>
+        </tr>
+        </thead>
+        <!-- Тело таблицы -->
+        <tbody>
+        <tr th:each="task : ${hourlyTasks}" th:data-task-id="${task.id}">
+            <!-- Здесь выводите данные для каждой задачи типа HOURLY -->
+            <td th:text="${task.name}"></td>
+            <td th:text="${hourlyRate}"></td>
+            <td>
+                <input type="number" th:value="${task.operations}" name="operations" style="width: 45px;" onchange="markChanges(); checkMaxValue(this);">
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <br>
+    <br>
+
+    <!-- Таблица для задач типа QUANTITATIVE -->
+    <h4>Задачи по упаковке:</h4>
+    <table class="table">
+        <!-- Заголовки столбцов -->
+        <thead>
+        <tr>
+            <th scope="col">операция</th>
+            <th scope="col">р/шт</th>
+            <th scope="col">упаковано шт.</th> <!-- Новый столбец -->
+        </tr>
+        </thead>
+        <!-- Тело таблицы -->
+        <tbody>
+        <tr th:each="task : ${quantitativeTasks}" th:data-task-id="${task.id}">
+            <!-- Здесь выводите данные для каждой задачи типа QUANTITATIVE -->
+            <td th:text="${task.name}"></td>
+            <td th:text="${task.costPerPiece}"></td>
+            <td>
+                <input type="number" th:value="${task.operations}" name="operations" style="width: 45px;" onchange="markChanges(); checkMaxValue(this);">
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
     <button class="btn btn-primary" onclick="saveChanges()">Save</button>
 </div>
 
@@ -59,14 +121,13 @@
 <script>
     var changesMade = false;
 
-    // Функция для проверки максимального допустимого числа
     function checkMaxValue(input) {
         var maxValue = 999;
         var value = parseInt(input.value, 10);
 
         if (isNaN(value) || value > maxValue) {
             alert('Максимальное допустимое число - ' + maxValue);
-            input.value = maxValue; // Устанавливаем максимальное значение
+            input.value = maxValue;
         }
     }
 
@@ -74,7 +135,6 @@
         changesMade = true;
     }
 
-    // Сохранение изменений при нажатии кнопки Save
     function saveChanges() {
         if (!changesMade) {
             alert('Нет внесенных изменений.');
@@ -102,7 +162,7 @@
             data: JSON.stringify(data),
             success: function () {
                 $('#successModal').modal('show');
-                changesMade = false; // Сброс флага изменений после успешного сохранения
+                changesMade = false;
             },
             error: function () {
                 alert('Произошла ошибка при сохранении изменений.');
@@ -110,23 +170,19 @@
         });
     }
 
-    // Предупреждение о несохраненных данных при попытке покинуть страницу
     window.addEventListener('beforeunload', function (e) {
         if (changesMade && !confirm('У вас есть несохраненные данные. Вы уверены, что хотите покинуть страницу?')) {
-            // Пользователь выбрал "Отмена", предотвращаем закрытие страницы
             e.preventDefault();
             e.returnValue = '';
         }
     });
 
-    // Закрытие модального окна успеха по нажатию на кнопку OK
     $('#successModal .btn-primary').click(function () {
         $('#successModal').modal('hide');
     });
 
-    // Закрытие модального окна успеха по закрытию окна (крестик)
     $('#successModal').on('hidden.bs.modal', function () {
-        // Выполните необходимые действия при закрытии модального окна
+        // Дополнительные действия при закрытии модального окна
     });
 </script>
 

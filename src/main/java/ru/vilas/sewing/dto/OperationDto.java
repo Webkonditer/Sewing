@@ -13,6 +13,7 @@ import java.util.Set;
 @Data
 public class OperationDto {
     private Long id;
+    private TaskTypes taskType;
     private String name;
     private String equipment;
     private int timeInSeconds;
