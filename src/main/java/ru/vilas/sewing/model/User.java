@@ -3,6 +3,7 @@ package ru.vilas.sewing.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.util.Set;
 
 @Setter
@@ -24,6 +25,8 @@ public class User {
     private String email;
     @Column(nullable = false)
     private String password;
+    BigDecimal hourlyRate;
+    BigDecimal salary;
 
     @OneToMany(mappedBy = "seamstress", cascade = CascadeType.ALL)
     @ToString.Exclude

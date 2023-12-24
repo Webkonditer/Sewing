@@ -16,6 +16,8 @@
         <tr>
             <th scope="col">ФИО</th>
             <th scope="col">Логин</th>
+            <th scope="col">Часовая ставка</th>
+            <th scope="col">Оклад</th>
             <th scope="col"></th>
         </tr>
         </thead>
@@ -23,6 +25,8 @@
         <tr th:each="seamstress : ${seamstresses}">
             <td th:text="${seamstress.name}"></td>
             <td th:text="${seamstress.username}"></td>
+            <td th:text="${seamstress.hourlyRate}"></td>
+            <td th:text="${seamstress.salary}"></td>
             <td>
                 <a th:href="@{/admin/seamstresses/edit/{id}(id=${seamstress.id})}" class="btn btn-warning btn-sm">
                     Edit

@@ -46,6 +46,13 @@ public class SeamstressController {
         }
     }
 
+    @GetMapping("/edit/{id}")
+    public String editSeamstress(@PathVariable Long id, Model model) {
+        User seamstress = seamstressService.getSeamstressById(id);
+        model.addAttribute("seamstress", seamstress);
+        return "admin/editSeamstress";
+    }
+
     @PostMapping("/edit")
     public String updateSeamstress(@ModelAttribute User user, Model model) {
 
@@ -68,11 +75,6 @@ public class SeamstressController {
         return "redirect:/admin/seamstresses";
     }
 
-    @GetMapping("/edit/{id}")
-    public String editSeamstress(@PathVariable Long id, Model model) {
-        User seamstress = seamstressService.getSeamstressById(id);
-        model.addAttribute("seamstress", seamstress);
-        return "admin/editSeamstress";
-    }
+
 }
 

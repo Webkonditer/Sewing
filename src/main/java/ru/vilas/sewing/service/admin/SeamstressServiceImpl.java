@@ -66,6 +66,8 @@ public class SeamstressServiceImpl implements SeamstressService {
         User oldUser = getSeamstressById(newUser.getId());
         oldUser.setName(newUser.getName());
         oldUser.setUsername(newUser.getUsername());
+        oldUser.setHourlyRate(newUser.getHourlyRate());
+        oldUser.setSalary(newUser.getSalary());
         if (!Objects.equals(newUser.getPassword(), "")){
             // Шифруем пароль перед сохранением в базу данных
             oldUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
