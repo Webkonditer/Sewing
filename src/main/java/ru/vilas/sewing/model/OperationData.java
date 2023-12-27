@@ -2,29 +2,45 @@ package ru.vilas.sewing.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
 import org.hibernate.annotations.Type;
+import ru.vilas.sewing.dto.TaskTypes;
 
+import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.LocalDate;
 
 @Entity
 @Data
+@ToString
 public class OperationData {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
-    private Task task;
+    private Category category;
+
+    @Enumerated(EnumType.STRING)
+    TaskTypes taskType;
 
     @ManyToOne
-    private Category category;
+    private Task task;
 
     @ManyToOne
     @JoinColumn(name = "seamstress_id", nullable = false)
     private User seamstress;
 
+    private BigDecimal costPerPiece;
+
+    private BigDecimal hourlyRate;
+
+    private BigDecimal salary;
+
     private LocalDate date;
 
     private int completedOperations;
+
+    private Duration hoursWorked;
 }
 

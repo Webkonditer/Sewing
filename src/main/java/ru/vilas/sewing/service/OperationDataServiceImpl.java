@@ -2,6 +2,7 @@ package ru.vilas.sewing.service;
 
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.vilas.sewing.dto.InOperationDto;
 import ru.vilas.sewing.dto.OperationDto;
@@ -14,10 +15,14 @@ import ru.vilas.sewing.model.Task;
 import ru.vilas.sewing.repository.TaskRepository;
 
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
+import static ru.vilas.sewing.dto.TaskTypes.HOURLY;
 
 @Service
 public class OperationDataServiceImpl implements OperationDataService {
@@ -51,6 +56,7 @@ public class OperationDataServiceImpl implements OperationDataService {
     public OperationDto convertToOperationDto(Task task, Long seamstressId) {
 
         OperationDto operationDto = new OperationDto();
+
         operationDto.setId(task.getId());
         operationDto.setTaskType(task.getTaskType());
         operationDto.setName(task.getName());
@@ -61,9 +67,16 @@ public class OperationDataServiceImpl implements OperationDataService {
         operationDto.setSeamstressId(seamstressId);
         operationDto.setOperations(operationDataRepository
                 .countCompletedOperationsBySeamstressAndDate(seamstressId, LocalDate.now(), task.getId()) );
-        System.out.println(seamstressId);
-        System.out.println(LocalDate.now());
-        System.out.println(task.getId());
+
+        if (task.getTaskType().equals(HOURLY)){
+            List<OperationData> operations = operationDataRepository
+                    .findFirstBySeamstressIdAndDateAndTaskId(seamstressId, LocalDate.now(), task.getId());
+            if (!operations.isEmpty()) {
+                Duration duration = operations.get(0).getHoursWorked();
+                operationDto.setHours((int)duration.toHours());
+                operationDto.setMinutes((int)duration.toMinutes() % 60);
+            }
+        }
 
         return operationDto;
     }
@@ -72,30 +85,55 @@ public class OperationDataServiceImpl implements OperationDataService {
     @Transactional
     public void saveOrUpdateOperations(List<InOperationDto> inoperationDtos) {
 
+        //Получаем текущую швею
         User user = customUserDetailsService.getCurrentUser();
 
         for (InOperationDto inoperationDto : inoperationDtos) {
 
+            // Получаем задачи
             Task task = taskRepository.getReferenceById(inoperationDto.getTaskId());
 
-            if (inoperationDto.getOperations() == 0) {
+            // Проверяем, не обнулил ли пользователь количество опереций по задаче.
+            if (inoperationDto.getOperations() == 0 && !task.getTaskType().equals(HOURLY)) {
                 if (operationDataRepository.existsByTaskAndSeamstressAndDate(task, user, LocalDate.now())){
                     operationDataRepository.deleteByTaskAndSeamstressAndDate(task, user, LocalDate.now());
                 }
                 continue;
             }
 
+            // Проверяем, не обнулил ли пользователь количество времени по задаче.
+            if (inoperationDto.getHours() == 0 && inoperationDto.getMinutes() == 0 && task.getTaskType().equals(HOURLY)) {
+                if (operationDataRepository.existsByTaskAndSeamstressAndDate(task, user, LocalDate.now())){
+                    operationDataRepository.deleteByTaskAndSeamstressAndDate(task, user, LocalDate.now());
+                }
+                continue;
+            }
+
+            // Если запись за текщие сутки существует, обновляем ее.
             if (operationDataRepository.existsByTaskAndSeamstressAndDate(task, user, LocalDate.now())){
-                operationDataRepository.updateCompletedOperationsByTaskAndSeamstressAndDate(
-                        task, user, LocalDate.now(), inoperationDto.getOperations());
+                operationDataRepository.updateCompletedOperationsAndHoursWorkedByTaskAndSeamstressAndDate(
+                        task, user, LocalDate.now(), inoperationDto.getOperations(),
+                        Duration.ofHours(inoperationDto.getHours()).plusMinutes(inoperationDto.getMinutes()));
                 continue;
             }
 
             OperationData operationData = new OperationData();
+
+            operationData.setCategory(task.getCategory());
+            operationData.setTaskType(task.getTaskType());
             operationData.setTask(task);
             operationData.setSeamstress(user);
+            if (!task.getTaskType().equals(HOURLY)) {
+                operationData.setCostPerPiece(task.getCostPerPiece());
+                operationData.setCompletedOperations(inoperationDto.getOperations());
+            }
+            if (task.getTaskType().equals(HOURLY)) {
+                operationData.setHourlyRate(user.getHourlyRate());
+                operationData.setHoursWorked(Duration.ofHours(inoperationDto.getHours()).plusMinutes(inoperationDto.getMinutes()));
+            }
+            operationData.setSalary(user.getSalary() != null ? user.getSalary() : BigDecimal.valueOf(0));
             operationData.setDate(LocalDate.now());
-            operationData.setCompletedOperations(inoperationDto.getOperations());
+
 
             operationDataRepository.save(operationData);
         }

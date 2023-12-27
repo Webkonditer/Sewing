@@ -53,7 +53,7 @@
         <tr>
             <th scope="col">операция</th>
             <th scope="col">часовая ставка</th>
-            <th scope="col">отработано часов</th>
+            <th scope="col">отработано времени</th>
         </tr>
         </thead>
         <!-- Тело таблицы -->
@@ -63,7 +63,9 @@
             <td th:text="${task.name}"></td>
             <td th:text="${hourlyRate}"></td>
             <td>
-                <input type="number" th:value="${task.operations}" name="operations" style="width: 45px;" onchange="markChanges(); checkMaxValue(this);">
+                <input type="number" th:value="${task.hours}" style="width: 45px;" id="hoursWorked" name="hoursWorked.hours" onchange="markChanges();" required/>
+                <span> : </span>
+                <input type="number" th:value="${task.minutes}" style="width: 45px;" id="minutesWorked" name="hoursWorked.minutes" onchange="markChanges();" required step="5"/>
             </td>
         </tr>
         </tbody>
@@ -146,7 +148,12 @@
             var row = $(this);
             var taskId = row.data('task-id');
             var operations = parseInt(row.find('input[name="operations"]').val(), 10);
-            data.push({taskId: taskId, operations: operations});
+
+            // Добавляем информацию о часах и минутах для каждой задачи
+            var hours = parseInt(row.find('input[name="hoursWorked.hours"]').val(), 10) || 0;
+            var minutes = parseInt(row.find('input[name="hoursWorked.minutes"]').val(), 10) || 0;
+
+            data.push({taskId: taskId, operations: operations, hours: hours, minutes: minutes});
         });
 
         var csrfToken = $("meta[name='_csrf']").attr("content");

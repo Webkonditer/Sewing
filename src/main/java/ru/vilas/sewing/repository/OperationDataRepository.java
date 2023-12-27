@@ -1,5 +1,6 @@
 package ru.vilas.sewing.repository;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -9,9 +10,11 @@ import ru.vilas.sewing.model.Task;
 import ru.vilas.sewing.model.User;
 
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface OperationDataRepository extends JpaRepository<OperationData, Long> {
     List<OperationData> findByTask(Task task);
@@ -32,13 +35,14 @@ public interface OperationDataRepository extends JpaRepository<OperationData, Lo
 
 
     @Modifying
-    @Query("UPDATE OperationData od SET od.completedOperations = :completedOperations " +
+    @Query("UPDATE OperationData od SET od.completedOperations = :completedOperations, od.hoursWorked = :newHoursWorked " +
             "WHERE od.task = :task AND od.seamstress = :seamstress AND od.date = :date")
-    void updateCompletedOperationsByTaskAndSeamstressAndDate(
+    void updateCompletedOperationsAndHoursWorkedByTaskAndSeamstressAndDate(
             @Param("task") Task task,
             @Param("seamstress") User seamstress,
             @Param("date") LocalDate date,
-            @Param("completedOperations") int completedOperations);
+            @Param("completedOperations") int completedOperations,
+            @Param("newHoursWorked") Duration newHoursWorked);
 
     @Query("SELECT COALESCE(SUM(od.completedOperations * t.costPerPiece), 0) " +
             "FROM OperationData od " +
@@ -67,6 +71,47 @@ public interface OperationDataRepository extends JpaRepository<OperationData, Lo
             "AND od.date = :currentDate")
     BigDecimal getEarningsByDate(@Param("seamstressId") Long seamstressId,
                                  @Param("currentDate") LocalDate currentDate);
+
+//    @Query("SELECT COALESCE(SUM(FUNCTION('HOUR', o.hoursWorked)), 0) " +
+//            "FROM OperationData o " +
+//            "WHERE o.seamstress.id = :seamstressId " +
+//            "AND o.date = :operationDate " +
+//            "AND o.task.id = :taskId")
+//    Integer getTotalHoursWorkedForTaskAndDate(@Param("seamstressId") Long seamstressId,
+//                                              @Param("operationDate") LocalDate operationDate,
+//                                              @Param("taskId") Long taskId);
+//
+//    @Query("SELECT COALESCE(SUM(FUNCTION('MINUTE', o.hoursWorked)), 0) " +
+//            "FROM OperationData o " +
+//            "WHERE o.seamstress.id = :seamstressId " +
+//            "AND o.date = :operationDate " +
+//            "AND o.task.id = :taskId")
+//    Integer getTotalMinutesWorkedForTaskAndDate(@Param("seamstressId") Long seamstressId,
+//                                                @Param("operationDate") LocalDate operationDate,
+//                                                @Param("taskId") Long taskId);
+
+
+
+//    @Query("SELECT COALESCE(SUM(o.hoursWorked), 0) FROM OperationData o " +
+//            "WHERE o.seamstress.id = :seamstressId " +
+//            "AND o.date = :operationDate " +
+//            "AND o.task.id = :taskId")
+//    Optional<Long> getTotalDurationByParams(
+//            @Param("seamstressId") Long seamstressId,
+//            @Param("operationDate") LocalDate operationDate,
+//            @Param("taskId") Long taskId
+//    );
+
+    @Query("SELECT o FROM OperationData o " +
+            "WHERE o.seamstress.id = :seamstressId " +
+            "AND o.date = :operationDate " +
+            "AND o.task.id = :taskId")
+    List<OperationData> findFirstBySeamstressIdAndDateAndTaskId(
+            @Param("seamstressId") Long seamstressId,
+            @Param("operationDate") LocalDate operationDate,
+            @Param("taskId") Long taskId
+    );
+
 
 
 }

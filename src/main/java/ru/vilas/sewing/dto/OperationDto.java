@@ -21,4 +21,6 @@ public class OperationDto {
     private int normPerShift;
     private Long seamstressId;
     private int operations;
+    private int hours;
+    private int minutes;
 }
