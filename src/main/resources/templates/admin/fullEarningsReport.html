@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/headFragment}"></head>
+
+<body>
+
+<div th:replace="~{fragments/headerFragment}"></div>
+
+<br /><br />
+
+<div class="container">
+    <h2>Отчет по заработку за период:</h2>
+
+    <form th:action="@{/admin/earnings}" method="get" class="form-inline">
+        <div class="form-group mx-2">
+            <label for="startDate">От:</label>
+            <input type="date" id="startDate" name="startDate" class="form-control" required th:value="${startDate}" />
+        </div>
+
+        <div class="form-group mx-2">
+            <label for="endDate">До:</label>
+            <input type="date" id="endDate" name="endDate" class="form-control" required th:value="${endDate}" />
+        </div>
+
+        <!-- Добавляем выпадающий список для выбора категории -->
+        <div class="form-group mx-2">
+            <label for="category">Категория:</label>
+            <select id="category" name="category" class="form-control">
+                <option value="0" th:selected="${selectedCategoryId eq 0}">Все категории</option>
+                <!-- Используем Thymeleaf для генерации опций категорий -->
+                <option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}"
+                        th:selected="${category.id eq selectedCategoryId}"></option>
+            </select>
+        </div>
+
+        <div class="form-group d-flex justify-content-end p-2">
+            <button type="submit" class="btn btn-primary">Ок</button>
+        </div>
+    </form>
+
+    <!-- Добавляем условие для показа таблицы в зависимости от выбранной категории -->
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>Имя швеи</th>
+            <th>Операции</th>
+            <!-- Используем Thymeleaf для генерации заголовков дат -->
+            <th th:each="paymentByDate : ${earningsList[0].paymentsByDateList}" th:text="${T(java.time.format.DateTimeFormatter).ofPattern('dd.MM.yyyy').format(paymentByDate.date)}"></th>
+            <th>Общая сумма</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- Используем Thymeleaf для генерации строк -->
+        <th:block th:each="earningsDto : ${earningsList}">
+            <tr>
+                <td class="fw-bold" th:text="${earningsDto.seamstressName}"></td>
+                <td>Количественные</td>
+                <!-- Используем Thymeleaf для генерации данных PaymentsByDate -->
+                <td th:each="paymentByDate : ${earningsDto.paymentsByDateList}" th:text="${paymentByDate.quantitativePayments}"></td>
+                <td class="fw-bold" th:text="${earningsDto.totalAmount}"></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>Временные</td>
+                <!-- Используем Thymeleaf для генерации данных PaymentsByDate -->
+                <td th:each="paymentByDate : ${earningsDto.paymentsByDateList}" th:text="${paymentByDate.hourlyPayments}"></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>Упаковка</td>
+                <!-- Используем Thymeleaf для генерации данных PaymentsByDate -->
+                <td th:each="paymentByDate : ${earningsDto.paymentsByDateList}" th:text="${paymentByDate.packagingPayments}"></td>
+                <td></td>
+            </tr>
+        </th:block>
+        </tbody>
+    </table>
+</div>
+
+</body>
+</html>

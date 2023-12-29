@@ -1,8 +1,6 @@
 package ru.vilas.sewing.service;
 
-import ru.vilas.sewing.dto.InOperationDto;
-import ru.vilas.sewing.dto.OperationDto;
-import ru.vilas.sewing.dto.SeamstressDto;
+import ru.vilas.sewing.dto.*;
 import ru.vilas.sewing.model.OperationData;
 import ru.vilas.sewing.model.Task;
 
@@ -25,5 +23,11 @@ public interface OperationDataService {
 
     List<SeamstressDto> getSeamstressDtosList(LocalDate startDate, LocalDate endDate);
 
+    List<EarningsDto> getСommonEarningsDtosList(LocalDate startDate, LocalDate endDate);
+
     List<String> getDatesInPeriod(LocalDate startDate, LocalDate endDate);
+
+    List<EarningsDto> getEarningsDtosList(LocalDate startDate, LocalDate endDate);
+
+    List<WorkedDto> getWorkedDtosList(LocalDate startDate, LocalDate endDate);
 }

@@ -8,59 +8,29 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import ru.vilas.sewing.dto.EarningsDto;
 import ru.vilas.sewing.dto.SeamstressDto;
+import ru.vilas.sewing.dto.WorkedDto;
 import ru.vilas.sewing.model.Category;
 import ru.vilas.sewing.service.CategoryServiceImpl;
 import ru.vilas.sewing.service.OperationDataService;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping("/admin")
-public class EarningsController {
+@RequestMapping("/admin/workedout")
+public class WorkedOutController {
 
     private final OperationDataService operationDataService;
     private final CategoryServiceImpl categoryService;
 
-    public EarningsController(OperationDataService operationDataService, CategoryServiceImpl categoryService) {
+    public WorkedOutController(OperationDataService operationDataService, CategoryServiceImpl categoryService) {
         this.operationDataService = operationDataService;
         this.categoryService = categoryService;
     }
 
     @GetMapping
-    public String getEarningsReport(
-            @RequestParam(name = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam(name = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
-            Model model) {
-
-        // Если параметры не переданы, устанавливаем значения по умолчанию
-
-        if (endDate == null) {
-            endDate = LocalDate.now().with(DayOfWeek.THURSDAY);
-        }
-
-        if (startDate == null) {
-            startDate = endDate.minusDays(6);
-        }
-
-        List<String> headers = operationDataService.getDatesInPeriod(startDate, endDate);
-        List<SeamstressDto> seamstressDtos = operationDataService.getSeamstressDtosList(startDate, endDate);
-
-        seamstressDtos.forEach(seamstressDto -> System.out.println(seamstressDto.getEarnings()) );
-
-        model.addAttribute("seamstressDtos", seamstressDtos);
-        model.addAttribute("tableHeaders", headers);
-        model.addAttribute("startDate", startDate);
-        model.addAttribute("endDate", endDate);
-
-        return "admin/earningsReport";
-    }
-
-    @GetMapping("/earnings")
     public String getSeparateEarningsReport(
             @RequestParam(name = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(name = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
@@ -75,7 +45,6 @@ public class EarningsController {
             startDate = endDate.minusDays(6);
         }
 
-
         List<Category> categories = categoryService.getAllCategories()
                 .stream()
                 .filter(Category::isActive) // Фильтрация по активным категориям
@@ -83,23 +52,26 @@ public class EarningsController {
         model.addAttribute("categories", categories);
 
 
-        List<EarningsDto> earningsDtos = operationDataService.getEarningsDtosList(startDate, endDate);
+        List<WorkedDto> workedDtos = operationDataService.getWorkedDtosList(startDate, endDate);
 
-        List<EarningsDto> earningsDtosList;
+        List<WorkedDto> workedDtosList;
 
-        if (category == null || category == 0) {
-            earningsDtosList = operationDataService.getСommonEarningsDtosList(startDate, endDate);
+
+
+        if (category == null) {
+            workedDtosList = workedDtos.stream().filter(dto -> dto.getCategory().getId().equals(categories.get(0).getId()))
+                    .collect(Collectors.toList());
         } else {
-            earningsDtosList = earningsDtos.stream().filter(dto -> dto.getCategory().getId().equals(category))
+            workedDtosList = workedDtos.stream().filter(dto -> dto.getCategory().getId().equals(category))
                     .collect(Collectors.toList());
         }
 
         model.addAttribute("categories", categories);
-        model.addAttribute("earningsList", earningsDtosList);
+        model.addAttribute("workedList", workedDtosList);
         model.addAttribute("startDate", startDate);
         model.addAttribute("endDate", endDate);
         model.addAttribute("selectedCategoryId", category);
 
-        return "admin/fullEarningsReport";
+        return "admin/workedOutReport";
     }
 }

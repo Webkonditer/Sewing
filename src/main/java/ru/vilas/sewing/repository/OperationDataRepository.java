@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import ru.vilas.sewing.model.Category;
 import ru.vilas.sewing.model.OperationData;
 import ru.vilas.sewing.model.Task;
 import ru.vilas.sewing.model.User;
@@ -72,35 +73,25 @@ public interface OperationDataRepository extends JpaRepository<OperationData, Lo
     BigDecimal getEarningsByDate(@Param("seamstressId") Long seamstressId,
                                  @Param("currentDate") LocalDate currentDate);
 
-//    @Query("SELECT COALESCE(SUM(FUNCTION('HOUR', o.hoursWorked)), 0) " +
-//            "FROM OperationData o " +
-//            "WHERE o.seamstress.id = :seamstressId " +
-//            "AND o.date = :operationDate " +
-//            "AND o.task.id = :taskId")
-//    Integer getTotalHoursWorkedForTaskAndDate(@Param("seamstressId") Long seamstressId,
-//                                              @Param("operationDate") LocalDate operationDate,
-//                                              @Param("taskId") Long taskId);
-//
-//    @Query("SELECT COALESCE(SUM(FUNCTION('MINUTE', o.hoursWorked)), 0) " +
-//            "FROM OperationData o " +
-//            "WHERE o.seamstress.id = :seamstressId " +
-//            "AND o.date = :operationDate " +
-//            "AND o.task.id = :taskId")
-//    Integer getTotalMinutesWorkedForTaskAndDate(@Param("seamstressId") Long seamstressId,
-//                                                @Param("operationDate") LocalDate operationDate,
-//                                                @Param("taskId") Long taskId);
-
-
-
-//    @Query("SELECT COALESCE(SUM(o.hoursWorked), 0) FROM OperationData o " +
-//            "WHERE o.seamstress.id = :seamstressId " +
-//            "AND o.date = :operationDate " +
-//            "AND o.task.id = :taskId")
-//    Optional<Long> getTotalDurationByParams(
+//    @Query("SELECT o FROM OperationData o " +
+//            "WHERE o.date BETWEEN :startDate AND :endDate " +
+//            "AND o.seamstress.id = :seamstressId " +
+//            "AND o.category = :category")
+//    List<OperationData> findBetweenDatesAndBySeamstressAndCategory(
+//            @Param("startDate") LocalDate startDate,
+//            @Param("endDate") LocalDate endDate,
 //            @Param("seamstressId") Long seamstressId,
-//            @Param("operationDate") LocalDate operationDate,
-//            @Param("taskId") Long taskId
-//    );
+//            @Param("category") Category category);
+
+    @Query("SELECT o FROM OperationData o " +
+            "WHERE o.date BETWEEN :startDate AND :endDate " +
+            "AND o.seamstress.id = :seamstressId " +
+            "AND (:category IS NULL OR o.category = :category)")
+    List<OperationData> findBetweenDatesAndBySeamstressAndCategory(
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate,
+            @Param("seamstressId") Long seamstressId,
+            @Param("category") Category category);
 
     @Query("SELECT o FROM OperationData o " +
             "WHERE o.seamstress.id = :seamstressId " +
