@@ -28,7 +28,7 @@
             <label for="hourlyRate" class="form-label">Часовая ставка</label>
             <div class="input-group">
                 <span class="input-group-text">&#8381;</span>
-                <input type="number" class="form-control" id="hourlyRate" name="hourlyRate" th:value="${user != null ? user.hourlyRate : ''}" step="0.10" />
+                <input type="number" class="form-control" id="hourlyRate" name="hourlyRate" th:value="${user != null ? user.hourlyRate : ''}" step="0.10" required />
             </div>
             <small id="costPerPieceHelp" class="form-text text-muted">Введите часовую ставку в рублях (например, 220.34).</small>
         </div>
@@ -36,7 +36,7 @@
             <label for="salary" class="form-label">Оклад</label>
             <div class="input-group">
                 <span class="input-group-text">&#8381;</span>
-                <input type="number" class="form-control" id="salary" name="salary" th:value="${user != null ? user.salary : ''}" step="0.10" />
+                <input type="number" class="form-control" id="salary" name="salary" th:value="${user != null ? user.salary : ''}" step="0.10" required />
             </div>
             <small id="salaryHelp" class="form-text text-muted">Введите оклад в рублях (например, 10000,30).</small>
         </div>
