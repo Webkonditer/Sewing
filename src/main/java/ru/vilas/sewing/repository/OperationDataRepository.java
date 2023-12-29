@@ -73,15 +73,6 @@ public interface OperationDataRepository extends JpaRepository<OperationData, Lo
     BigDecimal getEarningsByDate(@Param("seamstressId") Long seamstressId,
                                  @Param("currentDate") LocalDate currentDate);
 
-//    @Query("SELECT o FROM OperationData o " +
-//            "WHERE o.date BETWEEN :startDate AND :endDate " +
-//            "AND o.seamstress.id = :seamstressId " +
-//            "AND o.category = :category")
-//    List<OperationData> findBetweenDatesAndBySeamstressAndCategory(
-//            @Param("startDate") LocalDate startDate,
-//            @Param("endDate") LocalDate endDate,
-//            @Param("seamstressId") Long seamstressId,
-//            @Param("category") Category category);
 
     @Query("SELECT o FROM OperationData o " +
             "WHERE o.date BETWEEN :startDate AND :endDate " +

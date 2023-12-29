@@ -46,7 +46,7 @@ public class AdminTaskServiceImpl implements AdminTaskService {
     @Override
     public List<Task> getTasksByCategoryId(Long categoryId) {
         if (categoryId != null) {
-            return taskRepository.findByCategoryId(categoryId).stream()
+            return taskRepository.findByCategoryIdOrderByName(categoryId).stream()
                     .filter(Task::getActive)
                     .collect(Collectors.toList());
         } else {
