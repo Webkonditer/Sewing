@@ -54,21 +54,19 @@
         <!-- Используем Thymeleaf для генерации строк -->
         <th:block th:each="earningsDto : ${earningsList}">
             <tr>
-                <td class="fw-bold" th:text="${earningsDto.seamstressName}"></td>
+                <td rowspan="3" class="fw-bold" th:text="${earningsDto.seamstressName}"></td>
                 <td>Количественные</td>
                 <!-- Используем Thymeleaf для генерации данных PaymentsByDate -->
                 <td th:each="paymentByDate : ${earningsDto.paymentsByDateList}" th:text="${paymentByDate.quantitativePayments}"></td>
                 <td class="fw-bold" th:text="${earningsDto.totalAmount}"></td>
             </tr>
             <tr>
-                <td></td>
                 <td>Временные</td>
                 <!-- Используем Thymeleaf для генерации данных PaymentsByDate -->
                 <td th:each="paymentByDate : ${earningsDto.paymentsByDateList}" th:text="${paymentByDate.hourlyPayments}"></td>
                 <td></td>
             </tr>
             <tr>
-                <td></td>
                 <td>Упаковка</td>
                 <!-- Используем Thymeleaf для генерации данных PaymentsByDate -->
                 <td th:each="paymentByDate : ${earningsDto.paymentsByDateList}" th:text="${paymentByDate.packagingPayments}"></td>

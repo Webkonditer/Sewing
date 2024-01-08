@@ -54,14 +54,13 @@
         <!-- Используем Thymeleaf для генерации строк -->
         <th:block th:each="workedDto : ${workedList}">
             <tr>
-                <td class="fw-bold" th:text="${workedDto.seamstressName}"></td>
+                <td rowspan="3" class="fw-bold" th:text="${workedDto.seamstressName}"></td>
                 <td>Количественные</td>
                 <!-- Используем Thymeleaf для генерации данных PaymentsByDate -->
                 <td th:each="workedByDate : ${workedDto.workedByDateList}" th:text="${workedByDate.quantitativeWorked}"></td>
                 <td class="fw-bold" th:text="${workedDto.totalWorked.quantitativeWorked}"></td>
             </tr>
             <tr>
-                <td></td>
                 <td>Временные</td>
                 <!-- Используем Thymeleaf для генерации данных PaymentsByDate -->
                 <td th:each="workedByDate : ${workedDto.workedByDateList}" th:if="${workedByDate != null and workedByDate.hourlyWorked != null}">
@@ -70,7 +69,6 @@
                 <td class="fw-bold" th:if="${workedDto.totalWorked != null and workedDto.totalWorked.hourlyWorked != null}" th:text="${workedDto.totalWorked.hourlyWorkedToString}"></td>
             </tr>
             <tr>
-                <td></td>
                 <td>Упаковка</td>
                 <!-- Используем Thymeleaf для генерации данных PaymentsByDate -->
                 <td th:each="workedByDate : ${workedDto.workedByDateList}" th:text="${workedByDate.packagingWorked}"></td>

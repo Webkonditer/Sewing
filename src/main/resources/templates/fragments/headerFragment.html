@@ -45,6 +45,9 @@
                 <li class="nav-item" th:if="${#authorization.expression('hasRole(''ADMIN'') or hasRole(''DEMIGOD'')')}" th:classappend="${#authorization.expression('hasRole(''DEMIGOD'')') ? 'active' : ''}">
                     <a class="nav-link" th:href="@{/admin/tasks}">Задачи</a>
                 </li>
+                <li class="nav-item" th:if="${#authorization.expression('hasRole(''ADMIN'') or hasRole(''DEMIGOD'')')}" th:classappend="${#authorization.expression('hasRole(''DEMIGOD'')') ? 'active' : ''}">
+                    <a class="nav-link" th:href="@{/admin/operations}">Выполненные задачи</a>
+                </li>
                 <li class="nav-item" th:if="${#authorization.expression('hasRole(''DEMIGOD'')')}" th:classappend="${#authorization.expression('hasRole(''DEMIGOD'')') ? 'active' : ''}">
                     <a class="nav-link" th:href="@{/demigod}">Super-admin</a>
                 </li>
