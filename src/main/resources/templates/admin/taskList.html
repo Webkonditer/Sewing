@@ -33,8 +33,8 @@
     </div>
 
 </div>
-
 <script th:inline="javascript">
+
     document.addEventListener('DOMContentLoaded', function () {
         loadTasks();
     });
@@ -50,9 +50,46 @@
             if (xhr.readyState === 4 && xhr.status === 200) {
                 // Вставляем полученный HTML в тело таблицы
                 document.getElementById('tasksTableBody').innerHTML = xhr.responseText;
+
+                calculateAndDisplayTotalTime();
             }
         };
         xhr.send();
+    }
+
+    function  calculateAndDisplayTotalTime(){
+        var totalSeconds = 0;
+        var totalCost = 0.0;
+
+        //Используем класс 'timeInSeconds' для выбора всех ячеек со временем
+        var timeCells = document.getElementsByClassName('timeInSeconds');
+        var costCells = document.getElementsByClassName('costPerPiece');
+
+        //Проходим по всем ячейкам и складываем значения
+        for(var i = 0; i < timeCells.length; i++){
+            totalSeconds += parseInt(timeCells[i].textContent);
+            //Преобразовываем запятые в точки и парсим как float
+            totalCost += parseFloat(costCells[i].textContent.replace(',', '.'));
+        }
+
+        //Обновляем элемент с итоговым временем
+        var totalElement = document.getElementById('totalTime');
+        if(!totalElement){
+            totalElement = document.createElement('div');
+            totalElement.id = 'totalTime';
+
+           document.querySelector('table tbody').appendChild(totalElement);
+        }
+        totalElement.textContent = totalSeconds + ' сек';
+
+       //Обновляем элемент с итоговой стоимостью
+        var  totalCostElement = document.getElementById('totalCost');
+        if(!totalCostElement){
+            totalCostElement = document.createElement('td');
+            totalCostElement.id = 'totalCost';
+            document.querySelector('table tbody').appendChild(totalCostElement);
+        }
+        totalCostElement.textContent = totalCost.toFixed(2).replace('.', ',') + ' руб.';
     }
 </script>
 

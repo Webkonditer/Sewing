@@ -44,9 +44,9 @@
         <thead>
         <tr>
             <th>Имя швеи</th>
-            <th>Операции</th>
+            <th>Оп-ции</th>
             <!-- Используем Thymeleaf для генерации заголовков дат -->
-            <th th:each="workedByDate : ${workedList[0].workedByDateList}" th:text="${T(java.time.format.DateTimeFormatter).ofPattern('dd.MM.yyyy').format(workedByDate.date)}"></th>
+            <th th:each="workedByDate : ${workedList[0].workedByDateList}" th:text="${T(java.time.format.DateTimeFormatter).ofPattern('dd.MM.yy').format(workedByDate.date)}"></th>
             <th>Общее количество</th>
         </tr>
         </thead>
@@ -55,14 +55,14 @@
         <th:block th:each="workedDto : ${workedList}">
             <tr>
                 <td class="fw-bold" th:text="${workedDto.seamstressName}"></td>
-                <td>Количественные</td>
+                <td>Колич.</td>
                 <!-- Используем Thymeleaf для генерации данных PaymentsByDate -->
                 <td th:each="workedByDate : ${workedDto.workedByDateList}" th:text="${workedByDate.quantitativeWorked}"></td>
                 <td class="fw-bold" th:text="${workedDto.totalWorked.quantitativeWorked}"></td>
             </tr>
             <tr>
                 <td></td>
-                <td>Временные</td>
+                <td>Врем.</td>
                 <!-- Используем Thymeleaf для генерации данных PaymentsByDate -->
                 <td th:each="workedByDate : ${workedDto.workedByDateList}" th:if="${workedByDate != null and workedByDate.hourlyWorked != null}">
                     <span th:text="${workedByDate.getHourlyWorkedToString()}"></span>
@@ -71,7 +71,7 @@
             </tr>
             <tr>
                 <td></td>
-                <td>Упаковка</td>
+                <td>Упак.</td>
                 <!-- Используем Thymeleaf для генерации данных PaymentsByDate -->
                 <td th:each="workedByDate : ${workedDto.workedByDateList}" th:text="${workedByDate.packagingWorked}"></td>
                 <td class="fw-bold" th:text="${workedDto.totalWorked.packagingWorked}"></td>

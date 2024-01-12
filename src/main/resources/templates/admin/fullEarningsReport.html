@@ -44,9 +44,9 @@
         <thead>
         <tr>
             <th>Имя швеи</th>
-            <th>Операции</th>
+            <th>Оп-ции</th>
             <!-- Используем Thymeleaf для генерации заголовков дат -->
-            <th th:each="paymentByDate : ${earningsList[0].paymentsByDateList}" th:text="${T(java.time.format.DateTimeFormatter).ofPattern('dd.MM.yyyy').format(paymentByDate.date)}"></th>
+            <th th:each="paymentByDate : ${earningsList[0].paymentsByDateList}" th:text="${T(java.time.format.DateTimeFormatter).ofPattern('dd.MM.yy').format(paymentByDate.date)}"></th>
             <th>Общая сумма</th>
         </tr>
         </thead>
@@ -55,21 +55,21 @@
         <th:block th:each="earningsDto : ${earningsList}">
             <tr>
                 <td class="fw-bold" th:text="${earningsDto.seamstressName}"></td>
-                <td>Количественные</td>
+                <td>Колич.</td>
                 <!-- Используем Thymeleaf для генерации данных PaymentsByDate -->
                 <td th:each="paymentByDate : ${earningsDto.paymentsByDateList}" th:text="${paymentByDate.quantitativePayments}"></td>
                 <td class="fw-bold" th:text="${earningsDto.totalAmount}"></td>
             </tr>
             <tr>
                 <td></td>
-                <td>Временные</td>
+                <td>Врем.</td>
                 <!-- Используем Thymeleaf для генерации данных PaymentsByDate -->
                 <td th:each="paymentByDate : ${earningsDto.paymentsByDateList}" th:text="${paymentByDate.hourlyPayments}"></td>
                 <td></td>
             </tr>
             <tr>
                 <td></td>
-                <td>Упаковка</td>
+                <td>Упак.</td>
                 <!-- Используем Thymeleaf для генерации данных PaymentsByDate -->
                 <td th:each="paymentByDate : ${earningsDto.paymentsByDateList}" th:text="${paymentByDate.packagingPayments}"></td>
                 <td></td>
