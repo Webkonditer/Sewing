@@ -74,6 +74,10 @@ public class OperationDataController {
                 .map(task -> operationDataService.convertToOperationDto(task, currentUserId))
                 .toList();
 
+        Integer sumTimes =
+                operationDtos.stream().map(OperationDto::getTimeInSeconds).mapToInt(Integer::intValue).sum();
+
+
         List<OperationDto> quantitativeTasks = operationDtos.stream().filter(t -> t.getTaskType().equals(QUANTITATIVE)).toList();
         List<OperationDto> hourlyTasks = operationDtos.stream().filter(t -> t.getTaskType().equals(HOURLY)).toList();
         List<OperationDto> packagingTasks = operationDtos.stream().filter(t -> t.getTaskType().equals(PACKAGING)).toList();
@@ -84,6 +88,8 @@ public class OperationDataController {
         model.addAttribute("hourlyTasks", hourlyTasks);
         model.addAttribute("packagingTasks", packagingTasks);
         model.addAttribute("hourlyRate", hourlyRate);
+
+
 
         return "tasks";
     }
