@@ -16,8 +16,12 @@
 
         <td th:text="${task.taskType.getRussianName()}"></td>
         <td th:text="${task.name}"></td>
-        <td th:text="${task.timeInSeconds}"></td>
-        <td th:text="${task.costPerPiece}"></td>
+
+      <!--  <td th:text="${task.timeInSeconds}"></td>-->
+        <td class="timeInSeconds" th:text="${task.timeInSeconds}"></td>
+        <td class="costPerPiece" th:text="${task.costPerPiece}"></td>
+
+        <!--<td th:text="${task.costPerPiece}"></td>-->
         <td th:text="${task.normPerShift}"></td>
         <td>
             <a th:href="@{/admin/tasks/edit/{id}(id=${task.id})}" class="btn btn-warning btn-sm">Edit</a>
@@ -26,6 +30,14 @@
         </td>
     </tr>
     </tbody>
+    <tfoot>
+    <tr>
+        <td>Итого:</td>
+        <td> </td>
+        <td id="totalTime"></td><!--Ячейка для суммы времени-->
+        <td id="totalCost"></td><!--Ячейка для суммы денег-->
+    </tr>
+    </tfoot>
 </table>
 
 <!-- Модальное окно для подтверждения удаления задачи -->
