@@ -30,10 +30,13 @@
         <!-- Тело таблицы -->
         <tbody>
         <tr th:each="task : ${quantitativeTasks}" th:data-task-id="${task.id}">
-            <!-- Здесь выводите данные для каждой задачи типа QUANTITATIVE -->
+            <!-- Здесь выводятся данные для каждой задачи типа QUANTITATIVE -->
+            <td class="timeInSeconds" th:text="${task.timeInSeconds}"></td>
             <td th:text="${task.name}"></td>
-            <td th:text="${task.timeInSeconds}"></td>
-            <td th:text="${task.costPerPiece}"></td>
+           <!-- <td th:text="${task.timeInSeconds}"></td>-->
+            <td class="costPerPiece" th:text="${task.costPerPiece}"></td>
+
+           <!-- <td th:text="${task.costPerPiece}"></td>-->
             <td th:text="${task.normPerShift}"></td>
             <td>
                 <input type="number" th:value="${task.operations}" name="operations" style="width: 45px;" onchange="markChanges(); checkMaxValue(this);">
@@ -191,6 +194,7 @@
     $('#successModal').on('hidden.bs.modal', function () {
         // Дополнительные действия при закрытии модального окна
     });
+
 </script>
 
 </body>

@@ -16,8 +16,11 @@
         <td th:text="${task.id}"></td>
         <td th:text="${task.name}"></td>
         <td th:text="${task.equipment}"></td>
-        <td th:text="${task.timeInSeconds}"></td>
-        <td th:text="${task.costPerPiece}"></td>
+        <td class="timeInSeconds" th:text="${task.timeInSeconds}"></td>
+        <td class="costPerPiece" th:text="${task.costPerPiece}"></td>
+
+        <!-- <td th:text="${task.timeInSeconds}"></td>-->
+       <!-- <td th:text="${task.costPerPiece}"></td>-->
         <td th:text="${task.normPerShift}"></td>
         <td>
             <a th:href="@{/admin/tasks/edit/{id}(id=${task.id})}" class="btn btn-warning btn-sm">Edit</a>
