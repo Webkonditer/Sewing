@@ -231,10 +231,20 @@ public class OperationDataServiceImpl implements OperationDataService {
                             .add(earningsDto.getPaymentsByDateList().stream()
                                     .map(PaymentsByDate::getPackagingPayments)
                                     .reduce(BigDecimal.ZERO, BigDecimal::add))
+                            .setScale(2, RoundingMode.HALF_UP) // Установите два знака после запятой
             );
 
+            if (user.getSalary() != null && user.getSalary().compareTo(BigDecimal.ZERO) != 0 && allPayments.size() != 0) {
+                earningsDto.setSalary(user.getSalary().divide(new BigDecimal("21"), 2, RoundingMode.HALF_UP).multiply(new BigDecimal(allPayments.size())).setScale(2, RoundingMode.HALF_UP));
+            } else {
+                earningsDto.setSalary(new BigDecimal("0.00"));
+            }
+
+
+            earningsDto.setResult(earningsDto.getTotalAmount().subtract(earningsDto.getSalary()).setScale(2, RoundingMode.HALF_UP));
+
             earningsDtos.add(earningsDto);
-        }
+            }
 
         return earningsDtos;
     }
@@ -275,10 +285,11 @@ public class OperationDataServiceImpl implements OperationDataService {
                                 BigDecimal totalHours = BigDecimal.valueOf(hours)
                                         .add(BigDecimal.valueOf(minutes)
                                                 .divide(BigDecimal.valueOf(60), 2, RoundingMode.HALF_UP));
-                                return hourlyRate.multiply(totalHours);
+                                return hourlyRate.multiply(totalHours).setScale(2, RoundingMode.HALF_UP);
                             })
                             .reduce(BigDecimal.ZERO, BigDecimal::add)
             );
+
 
             paymentsByDate.setPackagingPayments(
                     operationDataList.stream()

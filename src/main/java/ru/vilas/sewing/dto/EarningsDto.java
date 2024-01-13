@@ -14,5 +14,7 @@ public class EarningsDto {
     private Category category;
     private List<PaymentsByDate> paymentsByDateList;
     private BigDecimal totalAmount;
+    private BigDecimal salary;
+    private BigDecimal result;
 
 }
