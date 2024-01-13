@@ -14,7 +14,7 @@
     <tbody>
     <tr th:each="task : ${tasks}">
 
-        <td th:text="${task.taskType.getRussianName()}"></td>
+        <td th:text="${task.taskType.abbreviatedName}"></td>
         <td th:text="${task.name}"></td>
         <td th:text="${task.timeInSeconds}"></td>
         <td th:text="${task.costPerPiece}"></td>
@@ -25,6 +25,7 @@
             <a href="#" class="btn btn-danger btn-sm" data-bs-toggle="modal" th:attr="data-bs-target='#deleteTaskModal' + ${task.id}">Del</a>
         </td>
     </tr>
+    <tr class="fw-bold"><td></td><td>Итого:</td><td th:text="${totalTimeInSeconds}"></td><td th:text="${totalCost}"></td><td></td><td></td></tr>
     </tbody>
 </table>
 
