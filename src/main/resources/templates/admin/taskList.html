@@ -13,10 +13,6 @@
     <!-- Используем форму для отправки выбора категории на сервер -->
     <form id="categoryForm">
         <label for="categorySelect" class="form-label">Выберите категорию:</label>
-<!--        <select id="categorySelect" name="categoryId" class="form-select" onchange="loadTasks()">-->
-<!--            <option value="">Все категории</option>-->
-<!--            <option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}"></option>-->
-<!--        </select>-->
         <select id="categorySelect" name="categoryId" class="form-select" onchange="loadTasks()">
             <!-- Используем th:each для обработки категорий -->
             <option th:each="category, iterStat : ${categories}"

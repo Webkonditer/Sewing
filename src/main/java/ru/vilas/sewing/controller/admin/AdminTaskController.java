@@ -11,6 +11,8 @@ import ru.vilas.sewing.service.admin.AdminCategoryService;
 import ru.vilas.sewing.service.admin.AdminTaskService;
 import ru.vilas.sewing.model.Category;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -48,7 +50,19 @@ public class AdminTaskController {
         } else {
             tasks = adminTaskService.getAllTasks();
         }
+
+        int totalTimeInSeconds = tasks.stream()
+                .mapToInt(Task::getTimeInSeconds)
+                .sum();
+
+        BigDecimal totalCost = tasks.stream()
+                .map(Task::getCostPerPiece)
+                .map(cost -> cost.setScale(2, RoundingMode.HALF_UP))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
         model.addAttribute("tasks", tasks);
+        model.addAttribute("totalTimeInSeconds", totalTimeInSeconds);
+        model.addAttribute("totalCost", totalCost);
         return "admin/fragments/tasksTable"; // Возвращаем только часть HTML для таблицы задач
     }
 

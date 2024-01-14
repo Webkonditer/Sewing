@@ -43,8 +43,8 @@
     <table class="table table-bordered">
         <thead>
         <tr>
-            <th>Имя швеи</th>
-            <th>Оп-ции</th>
+            <th style="width: 100px;">Имя швеи</th>
+            <th>Тип</th>
             <!-- Используем Thymeleaf для генерации заголовков дат -->
             <th th:each="paymentByDate : ${earningsList[0].paymentsByDateList}" th:text="${T(java.time.format.DateTimeFormatter).ofPattern('dd.MM.yy').format(paymentByDate.date)}"></th>
             <th>Общая сумма</th>
@@ -54,25 +54,28 @@
         <!-- Используем Thymeleaf для генерации строк -->
         <th:block th:each="earningsDto : ${earningsList}">
             <tr>
-                <td class="fw-bold" th:text="${earningsDto.seamstressName}"></td>
-                <td>Колич.</td>
+                <td rowspan="3" class="fw-bold" th:text="${earningsDto.seamstressName}"></td>
+                <td>Кол-е</td>
                 <!-- Используем Thymeleaf для генерации данных PaymentsByDate -->
                 <td th:each="paymentByDate : ${earningsDto.paymentsByDateList}" th:text="${paymentByDate.quantitativePayments}"></td>
-                <td class="fw-bold" th:text="${earningsDto.totalAmount}"></td>
+                <td rowspan="3" class="fw-bold">
+                    <div th:text="${earningsDto.totalAmount}"></div>
+                    <div th:text="'- ' + ${earningsDto.salary}"></div>
+                    <div th:text="'= ' + ${earningsDto.result}"></div>
+                </td>
+
             </tr>
             <tr>
-                <td></td>
-                <td>Врем.</td>
+                <td>Вр-е</td>
                 <!-- Используем Thymeleaf для генерации данных PaymentsByDate -->
                 <td th:each="paymentByDate : ${earningsDto.paymentsByDateList}" th:text="${paymentByDate.hourlyPayments}"></td>
-                <td></td>
+
             </tr>
             <tr>
-                <td></td>
-                <td>Упак.</td>
+                <td>Уп-ка</td>
                 <!-- Используем Thymeleaf для генерации данных PaymentsByDate -->
                 <td th:each="paymentByDate : ${earningsDto.paymentsByDateList}" th:text="${paymentByDate.packagingPayments}"></td>
-                <td></td>
+
             </tr>
         </th:block>
         </tbody>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/headFragment}"></head>
+
+<body>
+
+<div th:replace="~{fragments/headerFragment}"></div>
+
+<br/><br/>
+
+<div class="container">
+    <h2>Создать новую выполненную задачу</h2>
+    <form th:action="@{/admin/operations/new}" method="post" th:object="${operationData}" onsubmit="return markChangesBeforeSubmit();">
+
+        <!-- Ввод даты -->
+        <div class="mb-3">
+            <label for="date" class="form-label">Дата</label>
+            <input type="date" class="form-control" id="date" name="date" th:field="*{date}" required/>
+        </div>
+
+        <!-- Выбор портного -->
+        <div class="mb-3">
+            <label for="seamstress" class="form-label">Портной</label>
+            <select class="form-control" id="seamstress" name="seamstress" th:field="*{seamstress.id}" required>
+                <option th:each="seamstress : ${seamstresses}" th:value="${seamstress.id}" th:text="${seamstress.name}" th:selected="${seamstress.id eq operationData.seamstress?.id}"></option>
+            </select>
+        </div>
+
+        <!-- Выбор типа задачи -->
+        <div class="mb-3">
+            <label for="taskType" class="form-label">Тип задачи</label>
+            <select class="form-control" id="taskType" name="taskType" th:field="*{taskType}" required>
+                <option th:each="type : ${T(ru.vilas.sewing.dto.TaskTypes).values()}" th:value="${type}" th:text="${type.russianName}"></option>
+            </select>
+        </div>
+
+        <!-- Выбор категории -->
+        <div class="mb-3">
+            <label for="category" class="form-label">Категория</label>
+            <select class="form-control" id="category" name="category" th:field="*{category.id}" required>
+                <option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}" th:selected="${category.id eq operationData.category?.id}"></option>
+            </select>
+        </div>
+
+        <!-- Ввод  задачи -->
+        <div class="mb-3">
+            <label for="task" class="form-label">Задача</label>
+            <select class="form-control" id="task" name="task" th:field="*{task.id}" required>
+                <option th:each="task : ${tasks}" th:value="${task.id}" th:text="${task.name}" th:selected="${task.id eq operationData.task?.id}"></option>
+            </select>
+        </div>
+
+        <!-- Ввод стоимости за штуку -->
+        <div class="mb-3">
+            <label for="costPerPiece" class="form-label">Стоимость за штуку</label>
+            <div class="input-group">
+                <span class="input-group-text">&#8381;</span>
+                <input type="number" class="form-control" id="costPerPiece" name="costPerPiece" th:field="*{costPerPiece}" step="0.01" required/>
+            </div>
+            <small id="costPerPieceHelp" class="form-text text-muted">Введите стоимость в рублях (например, 12.34).</small>
+        </div>
+
+        <!-- Ввод часовой ставки -->
+        <div class="mb-3">
+            <label for="hourlyRate" class="form-label">Часовая ставка</label>
+            <div class="input-group">
+                <span class="input-group-text">&#8381;</span>
+                <input type="number" class="form-control" id="hourlyRate" name="hourlyRate" th:field="*{hourlyRate}" step="0.01" required/>
+            </div>
+            <small id="hourlyRateHelp" class="form-text text-muted">Введите ставку в рублях (например, 200.55).</small>
+        </div>
+
+
+        <!-- Ввод количества операций -->
+        <div class="mb-3">
+            <label for="completedOperations" class="form-label">Сделано шт.</label>
+            <input type="number" class="form-control" id="completedOperations" name="completedOperations" th:field="*{completedOperations}" step="1.00" required/>
+        </div>
+
+        <!-- Ввод затраченного времени -->
+        <div class="mb-3">
+<!--            //th:value="${task.hours}" // th:value="${task.minutes}"-->
+            <label for="hoursWorked" class="form-label">Затрачено времени</label><br>
+            <input type="number" style="width: 45px;" id="hoursWorked" name="hours" onchange="markChanges();" required/>
+            <span> : </span>
+            <input type="number" style="width: 45px;" id="minutesWorked" name="minutes" onchange="markChanges();" required step="5"/>
+            <input type="hidden" id="hoursWorkedHidden" name="hoursWorked" />
+        </div>
+        <script th:inline="javascript">
+            function markChanges() {
+                var hoursField = document.getElementById('hoursWorked');
+                var hours = parseInt(document.getElementById('hoursWorked').value) || 0;
+                var minutes = parseInt(document.getElementById('minutesWorked').value) || 0;
+                var duration = 'PT' +  hours + 'H' + minutes + 'M';  // Формат: PT4H30M
+                document.getElementById('hoursWorkedHidden').value = duration;
+                return true;  // Возвращаем true, чтобы форма продолжила отправку
+            }
+        </script>
+
+        <!-- Вывод ошибок валидации -->
+        <div th:if="${validationErrors}" class="alert alert-danger">
+            <ul>
+                <li th:each="error : ${validationErrors}" th:text="${error.defaultMessage}"></li>
+            </ul>
+        </div>
+
+        <!-- Кнопка для отправки формы -->
+        <button type="submit" class="btn btn-primary">Создать</button>
+    </form>
+</div>
+
+</body>
+</html>

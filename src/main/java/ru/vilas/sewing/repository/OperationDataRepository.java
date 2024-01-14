@@ -95,6 +95,6 @@ public interface OperationDataRepository extends JpaRepository<OperationData, Lo
     );
 
 
-
+    List<OperationData> findByCategoryIdAndSeamstressIdAndDateBetween(Long categoryId, Long seamstressId, LocalDate startDate, LocalDate endDate);
 }
 
