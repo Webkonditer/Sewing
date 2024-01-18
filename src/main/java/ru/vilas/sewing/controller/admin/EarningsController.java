@@ -12,11 +12,13 @@ import ru.vilas.sewing.model.Category;
 import ru.vilas.sewing.service.CategoryServiceImpl;
 import ru.vilas.sewing.service.OperationDataService;
 
+import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Controller
@@ -94,11 +96,23 @@ public class EarningsController {
                     .collect(Collectors.toList());
         }
 
+        BigDecimal salarySum = earningsDtosList.stream()
+                .map(EarningsDto::getSalary)
+                .filter(Objects::nonNull)
+                .reduce(BigDecimal.ZERO, BigDecimal::add).setScale(2, BigDecimal.ROUND_HALF_UP);
+
+        BigDecimal totalAmountSum = earningsDtosList.stream()
+                .map(EarningsDto::getTotalAmount)
+                .filter(Objects::nonNull)
+                .reduce(BigDecimal.ZERO, BigDecimal::add).setScale(2, BigDecimal.ROUND_HALF_UP);
+
         model.addAttribute("categories", categories);
         model.addAttribute("earningsList", earningsDtosList);
         model.addAttribute("startDate", startDate);
         model.addAttribute("endDate", endDate);
         model.addAttribute("selectedCategoryId", category);
+        model.addAttribute("salarySum", salarySum);
+        model.addAttribute("totalAmountSum", totalAmountSum);
 
         return "admin/fullEarningsReport";
     }

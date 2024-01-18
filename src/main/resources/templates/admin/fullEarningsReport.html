@@ -77,8 +77,23 @@
                 <td th:each="paymentByDate : ${earningsDto.paymentsByDateList}" th:text="${paymentByDate.packagingPayments}"></td>
 
             </tr>
+
+
         </th:block>
+
         </tbody>
+        <tfoot>
+        <tr>
+            <td></td>
+            <th th:each="paymentByDate : ${earningsList[0].paymentsByDateList}" ></th>
+            <td class="fw-bold">Итого:</td>
+            <td class="fw-bold">
+                <div th:text="${salarySum} + ' (оклады)'"></div>
+                <div th:text="${totalAmountSum} + ' (начисления)'"></div>
+                <div th:text="${totalAmountSum + salarySum} + ' (суммы)'"></div>
+            </td>
+        </tr>
+        </tfoot>
     </table>
 </div>
 
