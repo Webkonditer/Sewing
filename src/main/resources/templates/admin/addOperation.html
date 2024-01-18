@@ -23,6 +23,7 @@
         <div class="mb-3">
             <label for="seamstress" class="form-label">Портной</label>
             <select class="form-control" id="seamstress" name="seamstress" th:field="*{seamstress.id}" required>
+                <option value="">Выберите швею</option>
                 <option th:each="seamstress : ${seamstresses}" th:value="${seamstress.id}"
                         th:text="${seamstress.name}" th:selected="${seamstress.id eq operationData.seamstress?.id}" th:attr="data-hourly-rate=${seamstress.hourlyRate}"></option>
             </select>
@@ -32,6 +33,7 @@
         <div class="mb-3">
             <label for="taskType" class="form-label">Тип задачи</label>
             <select class="form-control" id="taskType" name="taskType" th:field="*{taskType}" required>
+                <option value="">Выберите тип</option>
                 <option th:each="type : ${T(ru.vilas.sewing.dto.TaskTypes).values()}" th:value="${type}" th:text="${type.russianName}"></option>
             </select>
         </div>
@@ -40,6 +42,7 @@
         <div class="mb-3">
             <label for="category" class="form-label">Категория</label>
             <select class="form-control" id="category" name="category" th:field="*{category.id}" required>
+                <option value="">Выберите категорию</option>
                 <option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}" th:selected="${category.id eq operationData.category?.id}"></option>
             </select>
         </div>
@@ -49,6 +52,7 @@
             <label for="task" class="form-label">Задача</label>
             <select class="form-control" id="task" name="task" th:field="*{task.id}" required>
                 <!-- Используйте data-category-id для связи задач с их категориями -->
+                <option value="">Выберите задачу</option>
                 <option th:each="task : ${tasks}" th:value="${task.id}" th:text="${task.name}" th:data-category-id="${task.category.id}"
                         th:selected="${task.id eq operationData.task?.id}"
                         th:attr="data-cost-per-piece=${task.costPerPiece}"></option>
@@ -85,21 +89,11 @@
         <div class="mb-3">
             <!--            //th:value="${task.hours}" // th:value="${task.minutes}"-->
             <label for="hoursWorked" class="form-label">Затрачено времени</label><br>
-            <input type="number" style="width: 45px;" id="hoursWorked" name="hours" onchange="markChanges();" required/>
+            <input type="number" style="width: 45px;" id="hoursWorked" name="hours" onchange="markChangesBeforeSubmit();" required/>
             <span> : </span>
-            <input type="number" style="width: 45px;" id="minutesWorked" name="minutes" onchange="markChanges();" required step="5"/>
+            <input type="number" style="width: 45px;" id="minutesWorked" name="minutes" onchange="markChangesBeforeSubmit();" required step="5"/>
             <input type="hidden" id="hoursWorkedHidden" name="hoursWorked" />
         </div>
-        <script th:inline="javascript">
-            function markChanges() {
-                var hoursField = document.getElementById('hoursWorked');
-                var hours = parseInt(document.getElementById('hoursWorked').value) || 0;
-                var minutes = parseInt(document.getElementById('minutesWorked').value) || 0;
-                var duration = 'PT' +  hours + 'H' + minutes + 'M';  // Формат: PT4H30M
-                document.getElementById('hoursWorkedHidden').value = duration;
-                return true;  // Возвращаем true, чтобы форма продолжила отправку
-            }
-        </script>
 
         <!-- Вывод ошибок валидации -->
         <div th:if="${validationErrors}" class="alert alert-danger">
@@ -198,6 +192,8 @@
                 document.getElementById('costPerPiece').value = originalCostPerPiece;
             }
         }
+
+
     });
 </script>
 
