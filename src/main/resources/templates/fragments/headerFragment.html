@@ -30,6 +30,10 @@
                     <a class="nav-link" th:href="@{/logout}">Logout</a>
                 </li>
                 <!-- Используем Thymeleaf для отображения элементов в зависимости от ролей -->
+                <li class="nav-item" th:if="${#authorization.expression('hasRole(''USER'')')}"
+                    th:classappend="${#authorization.expression('hasRole(''USER'')') ? 'active' : ''}">
+                    <a class="nav-link" th:href="@{/categories/seamstressReport}">Начисления</a>
+                </li>
                 <li class="nav-item" th:if="${#authorization.expression('hasRole(''ADMIN'') or hasRole(''DEMIGOD'')')}" th:classappend="${#authorization.expression('hasRole(''ADMIN'')') ? 'active' : ''}">
                     <a class="nav-link" th:href="@{/admin/earnings}">Начисления</a>
                 </li>

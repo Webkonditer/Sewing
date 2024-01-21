@@ -1,9 +1,11 @@
 package ru.vilas.sewing.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import ru.vilas.sewing.dto.SeamstressDto;
 import ru.vilas.sewing.model.Category;
 import ru.vilas.sewing.model.OperationData;
 import ru.vilas.sewing.model.Task;
@@ -11,6 +13,7 @@ import ru.vilas.sewing.service.CategoryService;
 import ru.vilas.sewing.service.OperationDataService;
 import ru.vilas.sewing.service.TaskService;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,10 +22,12 @@ import java.util.stream.Collectors;
 public class CategoryController {
 
     private final CategoryService categoryService;
+    private final OperationDataService operationDataService;
 
     @Autowired
-    public CategoryController(CategoryService categoryService) {
+    public CategoryController(CategoryService categoryService, OperationDataService operationDataService) {
         this.categoryService = categoryService;
+        this.operationDataService = operationDataService;
     }
 
     @GetMapping
@@ -35,7 +40,6 @@ public class CategoryController {
         model.addAttribute("requestURI", "/categories");
         return "categories";
     }
-
 
     @GetMapping("/{categoryId}")
     public String getCategoryDetails(@PathVariable Long categoryId, Model model) {
