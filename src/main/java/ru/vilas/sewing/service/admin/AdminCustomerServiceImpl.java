@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class AdminCustomerServiceImpl implements AdminCustomerService {
@@ -22,7 +23,9 @@ public class AdminCustomerServiceImpl implements AdminCustomerService {
 
     @Override
     public Set<Customer> getAllCustomers() {
-        return new LinkedHashSet<>(customerRepository.findAll(Sort.by(Sort.Direction.ASC, "name")));
+        return customerRepository.findAll(Sort.by(Sort.Direction.ASC, "name"))
+                .stream()
+                .filter(Customer::isActive).collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     @Override

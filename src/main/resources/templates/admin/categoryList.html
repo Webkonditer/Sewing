@@ -15,12 +15,14 @@
         <thead>
         <tr>
             <th scope="col">Название категории</th>
+            <th scope="col">Заказчик</th>
             <th scope="col"></th>
         </tr>
         </thead>
         <tbody>
         <tr th:each="category : ${categories}">
             <td th:text="${category.name}"></td>
+            <td th:text="${category.customer.name}"></td>
             <td>
                 <a th:href="@{/admin/categories/edit/{id}(id=${category.id})}" class="btn btn-warning btn-sm">
                     Edit
