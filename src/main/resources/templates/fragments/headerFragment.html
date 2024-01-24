@@ -40,6 +40,9 @@
                     <a class="nav-link" th:href="@{/admin/seamstresses}">Швеи</a>
                 </li>
                 <li class="nav-item" th:if="${#authorization.expression('hasRole(''ADMIN'') or hasRole(''DEMIGOD'')')}" th:classappend="${#authorization.expression('hasRole(''ADMIN'')') ? 'active' : ''}">
+                    <a class="nav-link" th:href="@{/admin/customers}">Заказчики</a>
+                </li>
+                <li class="nav-item" th:if="${#authorization.expression('hasRole(''ADMIN'') or hasRole(''DEMIGOD'')')}" th:classappend="${#authorization.expression('hasRole(''ADMIN'')') ? 'active' : ''}">
                     <a class="nav-link" th:href="@{/admin/categories}">Категории</a>
                 </li>
                 <li class="nav-item" th:if="${#authorization.expression('hasRole(''ADMIN'') or hasRole(''DEMIGOD'')')}" th:classappend="${#authorization.expression('hasRole(''DEMIGOD'')') ? 'active' : ''}">
