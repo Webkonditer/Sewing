@@ -161,14 +161,10 @@ public class OperationDataServiceImpl implements OperationDataService {
     }
 
     @Override
-    public List<EarningsDto> getEarningsDtosList(LocalDate startDate, LocalDate endDate) {
+    public List<EarningsDto> getEarningsDtosList(LocalDate startDate, LocalDate endDate, List<Category> categories) {
 
         List<User> users = customUserDetailsService.getAllUsers();
         List<EarningsDto> earningsDtos = new ArrayList<>();
-        List<Category> categories = categoryService.getAllCategories()
-                .stream()
-                .filter(Category::isActive) // Фильтрация по активным категориям
-                .toList();
         for (User user: users) {
             if (user.getRoles().stream().anyMatch(role -> !role.getName().equals("ROLE_USER"))) {
                 continue;

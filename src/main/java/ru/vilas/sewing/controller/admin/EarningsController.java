@@ -9,15 +9,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import ru.vilas.sewing.dto.EarningsDto;
 import ru.vilas.sewing.dto.SeamstressDto;
 import ru.vilas.sewing.model.Category;
+import ru.vilas.sewing.model.Customer;
 import ru.vilas.sewing.service.CategoryServiceImpl;
 import ru.vilas.sewing.service.OperationDataService;
+import ru.vilas.sewing.service.admin.AdminCustomerService;
 
 import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -28,9 +29,12 @@ public class EarningsController {
     private final OperationDataService operationDataService;
     private final CategoryServiceImpl categoryService;
 
-    public EarningsController(OperationDataService operationDataService, CategoryServiceImpl categoryService) {
+    private final AdminCustomerService adminCustomerService;
+
+    public EarningsController(OperationDataService operationDataService, CategoryServiceImpl categoryService, AdminCustomerService adminCustomerService) {
         this.operationDataService = operationDataService;
         this.categoryService = categoryService;
+        this.adminCustomerService = adminCustomerService;
     }
 
     @GetMapping
@@ -67,6 +71,7 @@ public class EarningsController {
             @RequestParam(name = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(name = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
             @RequestParam(name = "category", required = false) Long category,
+            @RequestParam(name = "customer", required = false) Long customerId,
             Model model) {
 
         // Если параметры не переданы, устанавливаем значения по умолчанию
@@ -77,23 +82,28 @@ public class EarningsController {
             startDate = endDate.minusDays(6);
         }
 
-
         List<Category> categories = categoryService.getAllCategories()
                 .stream()
                 .filter(Category::isActive) // Фильтрация по активным категориям
                 .collect(Collectors.toList());
         model.addAttribute("categories", categories);
 
+        List<Customer> customers = new ArrayList<>(adminCustomerService.getAllCustomers());
 
-        List<EarningsDto> earningsDtos = operationDataService.getEarningsDtosList(startDate, endDate);
+        List<EarningsDto> earningsDtos;
+
+        List<Category> categoryList = new ArrayList<>();
 
         List<EarningsDto> earningsDtosList;
 
-        if (category == null || category == 0) {
+        if ((category == null || category == 0) && (customerId == null || customerId == 0)) {
             earningsDtosList = operationDataService.getСommonEarningsDtosList(startDate, endDate);
-        } else {
-            earningsDtosList = earningsDtos.stream().filter(dto -> dto.getCategory().getId().equals(category))
-                    .collect(Collectors.toList());
+        } else if ((category != null)) {
+            categoryList.add(categoryService.getCategoryById(category));
+            earningsDtosList = operationDataService.getEarningsDtosList(startDate, endDate, categoryList);
+        } else  {
+            categoryList = categories.stream().filter(c -> Objects.equals(c.getCustomer().getId(), customerId)).toList();
+            earningsDtosList = operationDataService.getEarningsDtosList(startDate, endDate, categoryList);
         }
 
         BigDecimal salarySum = earningsDtosList.stream()
@@ -111,9 +121,12 @@ public class EarningsController {
         model.addAttribute("startDate", startDate);
         model.addAttribute("endDate", endDate);
         model.addAttribute("selectedCategoryId", category);
+        model.addAttribute("customers", customers);
+        model.addAttribute("selectedCustomerId", customerId);
         model.addAttribute("salarySum", salarySum);
         model.addAttribute("totalAmountSum", totalAmountSum);
 
         return "admin/fullEarningsReport";
     }
+
 }

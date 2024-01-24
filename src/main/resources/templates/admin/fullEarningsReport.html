@@ -23,6 +23,17 @@
             <input type="date" id="endDate" name="endDate" class="form-control" required th:value="${endDate}" />
         </div>
 
+        <!-- Добавляем выпадающий список для выбора заказчика -->
+        <div class="form-group mx-2">
+            <label for="customer">Заказчик:</label>
+            <select id="customer" name="customer" class="form-control">
+                <option value="0" th:selected="${selectedCustomerId eq 0}">Все заказчики</option>
+                <!-- Используем Thymeleaf для генерации опций заказчиков -->
+                <option th:each="customer : ${customers}" th:value="${customer.id}" th:text="${customer.name}"
+                        th:selected="${customer.id eq selectedCustomerId}"></option>
+            </select>
+        </div>
+
         <!-- Добавляем выпадающий список для выбора категории -->
         <div class="form-group mx-2">
             <label for="category">Категория:</label>
