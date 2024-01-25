@@ -126,7 +126,7 @@
 <script>
     var changesMade = false;
 
-    function checkMaxValue(input) {
+   /* function checkMaxValue(input) {
         var maxValue = 999;
         var value = parseInt(input.value, 10);
 
@@ -134,7 +134,20 @@
             alert('Максимальное допустимое число - ' + maxValue);
             input.value = maxValue;
         }
+    }*/
+    function checkMaxValue(input) {
+        var row = $(input).closest('tr');
+        var normPerShift = parseInt(row.find('td:eq(3)').text(), 10); // Получаем значение нормы/смену из третьего столбца
+        var maxValue = normPerShift * 4; // Умножаем на 4
+
+        var value = parseInt(input.value, 10);
+
+        if (isNaN(value) || value > maxValue) {
+            alert('Максимальное допустимое число - ' + maxValue);
+            input.value = maxValue;
+        }
     }
+
 
     function markChanges() {
         changesMade = true;
