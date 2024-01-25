@@ -33,13 +33,19 @@ public class AdminOperationServiceImpl implements AdminOperationService {
                 operationData -> operationData.getSeamstress().getId().equals(seamstressId) :
                 operationData -> true;
 
+        Predicate<OperationData> userRoleFilter = operationData -> operationData.getSeamstress().getRoles().stream()
+                .anyMatch(role -> role.getName().equals("ROLE_USER"));
+
         // Фильтр по датам
         Predicate<OperationData> dateFilter = operationData ->
                 (startDate == null || operationData.getDate().isAfter(startDate) || operationData.getDate().isEqual(startDate)) &&
                         (endDate == null || operationData.getDate().isBefore(endDate) || operationData.getDate().isEqual(endDate));
 
         return operationDataRepository.findAll().stream()
-                .filter(categoryFilter.and(seamstressFilter).and(dateFilter))
+                .filter(categoryFilter
+                        .and(seamstressFilter)
+                        .and(userRoleFilter)
+                        .and(dateFilter))
                 .sorted(Comparator.comparing(OperationData::getDate).reversed())
                 .collect(Collectors.toList());
     }
