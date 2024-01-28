@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.vilas.sewing.model.Category;
 import ru.vilas.sewing.service.admin.AdminCategoryService;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,6 +28,7 @@ public class AdminCategoryController {
                 .filter(Category::isActive) // Фильтрация по активным категориям
                 .collect(Collectors.toList());
         model.addAttribute("categories", categories);
+
         return "admin/categoryList";
     }
 

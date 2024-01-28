@@ -20,14 +20,11 @@ import java.util.stream.Collectors;
 @Controller
 @RequestMapping("/categories")
 public class CategoryController {
-
     private final CategoryService categoryService;
-    private final OperationDataService operationDataService;
 
     @Autowired
-    public CategoryController(CategoryService categoryService, OperationDataService operationDataService) {
+    public CategoryController(CategoryService categoryService) {
         this.categoryService = categoryService;
-        this.operationDataService = operationDataService;
     }
 
     @GetMapping
