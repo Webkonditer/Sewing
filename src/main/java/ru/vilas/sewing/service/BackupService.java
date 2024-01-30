@@ -16,12 +16,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Properties;
 
 @Service
 public class BackupService {
-    private final JdbcTemplate jdbcTemplate;
 
     @Value("${backup.directory}")
     private String backupDirectory;
@@ -49,10 +49,6 @@ public class BackupService {
     @Value("${mail.smtp.starttls.enable}")
     private String smtpStartTlsEnable;
 
-    public BackupService(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
-
     public void createBackupAndSendEmail() {
         String pgDumpPath = "C:\\Program Files\\PostgreSQL\\16\\bin\\pg_dump.exe";
 
@@ -60,10 +56,8 @@ public class BackupService {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
         String timestamp = dateFormat.format(new Date());
         String backupFileName = "backup_" + timestamp + ".sql";
-
         // Указываете путь к файлу для сохранения результата
         String output = "D:\\Backup\\backup_" + timestamp + ".sql";
-
         // Создание резервной копии базы данных с использованием pg_dump
         // параметры команды
         String[] command = {
@@ -73,19 +67,15 @@ public class BackupService {
                 "-h", "localhost",
                 "-p", "5432",
                 "-w",
-                "-F", "t",
+                "-F", "t"
         };
-
         File outputFile = new File(output);
-
         // Добавляем перенаправление вывода в файл
         ProcessBuilder processBuilder = new ProcessBuilder(command);
         processBuilder.redirectOutput(outputFile);
-
         try {
             // Запускаем процесс
             Process process = processBuilder.start();
-
             // Читаем вывод ошибок
             try (BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()))) {
                 String line;
@@ -93,15 +83,31 @@ public class BackupService {
                     System.out.println("Ошибка pg_dump: " + line);
                 }
             }
-
             // Дожидаемся завершения процесса
             int exitCode = process.waitFor();
-
             if (exitCode == 0) {
-                System.out.println("Бэкап успешно создан.");
+
+                // Сжимаем и удаляем файл с использованием 7-Zip
+                String zipCommand = "C:\\Program Files\\7-Zip\\7z.exe";
+                String[] zipArgs = {
+                        "a",
+                        "-tgzip",
+                        "\"" + output + ".gz\"",
+                        "\"" + output + "\"",
+                        "-sdel"
+                };
+                ProcessBuilder zipProcessBuilder = new ProcessBuilder(zipCommand);
+                zipProcessBuilder.command().addAll(Arrays.asList(zipArgs));
+                Process zipProcess = zipProcessBuilder.start();
+                zipProcess.waitFor();
+
+                // Получаем новый путь к архивированному файлу
+                String zipOutput = output + ".gz";
+                File zipOutputFile = new File(zipOutput);
+                System.out.println("Бэкап успешно создан и сжат.");
 
                 // Отправляем бэкап по электронной почте
-                sendBackupByEmail(outputFile);
+                sendBackupByEmail(zipOutputFile);
             } else {
                 System.out.println("Произошла ошибка при создании бэкапа. Код завершения: " + exitCode);
             }
@@ -109,7 +115,6 @@ public class BackupService {
             e.printStackTrace();
         }
     }
-
     private void sendBackupByEmail(File backupFile) {
         // Создаем свойства
         Properties properties = new Properties();
@@ -117,7 +122,6 @@ public class BackupService {
         properties.put("mail.smtp.starttls.enable", smtpStartTlsEnable);
         properties.put("mail.smtp.host", smtpHost);
         properties.put("mail.smtp.port", smtpPort);
-
         // Получаем объект Session
         Session session = Session.getInstance(properties, new Authenticator() {
             @Override
@@ -166,6 +170,4 @@ public class BackupService {
         }
     }
 }
-
-
 
