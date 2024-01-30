@@ -74,7 +74,7 @@ public class EarningsController {
             @RequestParam(name = "customer", required = false) Long customerId,
             Model model) {
 
-        // Если параметры не переданы, устанавливаем значения по умолчанию
+        // Если даты не переданы, устанавливаем значения по умолчанию
         if (endDate == null) {
             endDate = LocalDate.now().with(DayOfWeek.THURSDAY);
         }
@@ -82,29 +82,32 @@ public class EarningsController {
             startDate = endDate.minusDays(6);
         }
 
-        List<Category> categories = categoryService.getAllCategories()
+        // Получение списка всех категорий
+        List<Category> allCategories = categoryService.getAllCategories()
                 .stream()
                 .filter(Category::isActive) // Фильтрация по активным категориям
                 .collect(Collectors.toList());
-        model.addAttribute("categories", categories);
 
+        // Получение списка всех заказчиков
         List<Customer> customers = new ArrayList<>(adminCustomerService.getAllCustomers());
-
-        List<EarningsDto> earningsDtos;
 
         List<Category> categoryList = new ArrayList<>();
 
         List<EarningsDto> earningsDtosList;
 
+        // Создаем лист EarningsDto в зависимости от выставленного фильтра
         if ((category == null || category == 0) && (customerId == null || customerId == 0)) {
-            earningsDtosList = operationDataService.getСommonEarningsDtosList(startDate, endDate);
-        } else if ((category != null)) {
+            earningsDtosList = operationDataService.getCommonEarningsDtosList(startDate, endDate);
+        } else if ((category != null) && (category != 0)) {
             categoryList.add(categoryService.getCategoryById(category));
             earningsDtosList = operationDataService.getEarningsDtosList(startDate, endDate, categoryList);
         } else  {
-            categoryList = categories.stream().filter(c -> Objects.equals(c.getCustomer().getId(), customerId)).toList();
+            categoryList = allCategories.stream().filter(c -> Objects.equals(c.getCustomer().getId(), customerId)).toList();
             earningsDtosList = operationDataService.getEarningsDtosList(startDate, endDate, categoryList);
         }
+
+        System.out.println("!!!!!!!!!!!!! " + categoryList);
+        categoryList = null;
 
         BigDecimal salarySum = earningsDtosList.stream()
                 .map(EarningsDto::getSalary)
@@ -116,7 +119,7 @@ public class EarningsController {
                 .filter(Objects::nonNull)
                 .reduce(BigDecimal.ZERO, BigDecimal::add).setScale(2, BigDecimal.ROUND_HALF_UP);
 
-        model.addAttribute("categories", categories);
+        model.addAttribute("categories", allCategories);
         model.addAttribute("earningsList", earningsDtosList);
         model.addAttribute("startDate", startDate);
         model.addAttribute("endDate", endDate);

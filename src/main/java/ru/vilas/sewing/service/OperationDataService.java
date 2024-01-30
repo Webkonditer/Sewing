@@ -26,7 +26,7 @@ public interface OperationDataService {
 
     List<EarningsDto> getEarningsDtosList(LocalDate startDate, LocalDate endDate, List<Category> categories);
 
-    List<EarningsDto> getСommonEarningsDtosList(LocalDate startDate, LocalDate endDate);
+    List<EarningsDto> getCommonEarningsDtosList(LocalDate startDate, LocalDate endDate);
 
     List<String> getDatesInPeriod(LocalDate startDate, LocalDate endDate);
 

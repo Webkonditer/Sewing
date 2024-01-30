@@ -98,6 +98,7 @@
         var categorySelect = document.getElementById('category');
         originalCategories = Array.from(categorySelect.options); // Сохраняем все категории при загрузке страницы
         var customerSelect = document.getElementById('customer');
+        updateCategoryList();
         customerSelect.addEventListener('change', updateCategoryList);
     });
 

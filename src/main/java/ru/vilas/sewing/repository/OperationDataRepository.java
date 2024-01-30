@@ -85,6 +85,16 @@ public interface OperationDataRepository extends JpaRepository<OperationData, Lo
             @Param("category") Category category);
 
     @Query("SELECT o FROM OperationData o " +
+            "WHERE o.date BETWEEN :startDate AND :endDate " +
+            "AND o.seamstress.id = :seamstressId " +
+            "AND (:categories IS NULL OR o.category IN :categories)")
+    List<OperationData> findBetweenDatesAndBySeamstressAndCategories(
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate,
+            @Param("seamstressId") Long seamstressId,
+            @Param("categories") List<Category> categories);
+
+    @Query("SELECT o FROM OperationData o " +
             "WHERE o.seamstress.id = :seamstressId " +
             "AND o.date = :operationDate " +
             "AND o.task.id = :taskId")
