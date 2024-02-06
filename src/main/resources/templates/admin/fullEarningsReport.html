@@ -50,7 +50,8 @@
         <tr>
             <th style="width: 100px;">Имя швеи</th>
             <th>Тип</th>
-            <th th:each="paymentByDate : ${earningsList[0].paymentsByDateList}" th:text="${T(java.time.format.DateTimeFormatter).ofPattern('dd.MM.yy').format(paymentByDate.date)}"></th>
+            <th th:each="paymentByDate : ${earningsList[0].paymentsByDateList}"
+                th:text="${T(java.time.format.DateTimeFormatter).ofPattern('dd.MM.yy').format(paymentByDate.date)}"></th>
             <th>Общая сумма</th>
         </tr>
         </thead>

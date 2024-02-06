@@ -28,7 +28,7 @@ public class AdminOperationServiceImpl implements AdminOperationService {
                 operationData -> operationData.getCategory().getId().equals(categoryId) :
                 operationData -> true;
 
-        // Фильтр по швеи
+        // Фильтр по швее
         Predicate<OperationData> seamstressFilter = (seamstressId != null && seamstressId != 0) ?
                 operationData -> operationData.getSeamstress().getId().equals(seamstressId) :
                 operationData -> true;

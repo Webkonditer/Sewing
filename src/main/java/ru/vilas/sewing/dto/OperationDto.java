@@ -6,6 +6,7 @@ import ru.vilas.sewing.model.Category;
 import ru.vilas.sewing.model.OperationData;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Set;
 
 
@@ -23,4 +24,8 @@ public class OperationDto {
     private int operations;
     private int hours;
     private int minutes;
+
+    //private Category category;
+    //private LocalDate date;
+
 }

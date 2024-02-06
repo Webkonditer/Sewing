@@ -31,6 +31,7 @@ public class OperationDataServiceImpl implements OperationDataService {
         this.taskRepository = taskRepository;
         this.categoryService = categoryService;
         this.customUserDetailsService = customUserDetailsService;
+
     }
 
     @Override
@@ -89,7 +90,7 @@ public class OperationDataServiceImpl implements OperationDataService {
             // Получаем задачи
             Task task = taskRepository.getReferenceById(inoperationDto.getTaskId());
 
-            // Проверяем, не обнулил ли пользователь количество опереций по задаче.
+            // Проверяем, не обнулил ли пользователь количество операций по задаче.
             if (inoperationDto.getOperations() == 0 && !task.getTaskType().equals(HOURLY)) {
                 if (operationDataRepository.existsByTaskAndSeamstressAndDate(task, user, LocalDate.now())){
                     operationDataRepository.deleteByTaskAndSeamstressAndDate(task, user, LocalDate.now());
@@ -105,7 +106,7 @@ public class OperationDataServiceImpl implements OperationDataService {
                 continue;
             }
 
-            // Если запись за текщие сутки существует, обновляем ее.
+            // Если запись за текущие сутки существует, обновляем ее.
             if (operationDataRepository.existsByTaskAndSeamstressAndDate(task, user, LocalDate.now())){
                 operationDataRepository.updateCompletedOperationsAndHoursWorkedByTaskAndSeamstressAndDate(
                         task, user, LocalDate.now(), inoperationDto.getOperations(),
