@@ -33,7 +33,6 @@ public class OperationDataServiceImpl implements OperationDataService {
         this.customUserDetailsService = customUserDetailsService;
 
     }
-
     @Override
     public void saveOperationData(OperationData operationData) {
         operationDataRepository.save(operationData);
@@ -254,8 +253,10 @@ public class OperationDataServiceImpl implements OperationDataService {
         return earningsDtos;
     }
 
+
     private List<PaymentsByDate> getPaymentsByDateList(LocalDate startDate, LocalDate endDate, Long seamstressId, List<Category> categories) {
         List<OperationData> operationDataList = operationDataRepository.findBetweenDatesAndBySeamstressAndCategories(startDate, endDate, seamstressId, categories);
+
 
         List<PaymentsByDate> paymentsByDateList = new ArrayList<>();
 
@@ -367,6 +368,21 @@ public class OperationDataServiceImpl implements OperationDataService {
         return workedDtos;
     }
 
+    @Override
+    public SeamstressDto getSeamstressDto(LocalDate startDate, LocalDate endDate) {
+        User user = customUserDetailsService.getCurrentUser(); // Предположим, что у вас есть доступ к пользователю
+
+        SeamstressDto seamstressDto = new SeamstressDto();
+        seamstressDto.setSeamstressId(user.getId());
+        seamstressDto.setSeamstressName(user.getName());
+
+        List<BigDecimal> earnings = getEarningsByDateRange(user.getId(), startDate, endDate);
+        seamstressDto.setEarnings(earnings);
+        seamstressDto.setAmountOfEarnings(earnings.stream().reduce(BigDecimal.ZERO, BigDecimal::add));
+
+        return seamstressDto;
+    }
+
     private List<WorkedByDate> getWorkedByDateList(LocalDate startDate, LocalDate endDate, Long seamstressId, Category category) {
         List<OperationData> operationDataList = operationDataRepository.findBetweenDatesAndBySeamstressAndCategory(startDate, endDate, seamstressId, category);
 
@@ -445,6 +461,5 @@ public class OperationDataServiceImpl implements OperationDataService {
         );
         return sumWorkedByDate;
     }
-
 }
 

@@ -8,6 +8,7 @@ import ru.vilas.sewing.model.Customer;
 import ru.vilas.sewing.service.admin.AdminCategoryService;
 import ru.vilas.sewing.service.admin.AdminCustomerService;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -34,6 +35,7 @@ public class AdminCategoryController {
         Set<Customer> customers = adminCustomerService.getAllCustomers(); // Получаем список всех заказчиков
         model.addAttribute("customers", customers);
         model.addAttribute("categories", categories);
+
         return "admin/categoryList";
     }
 
