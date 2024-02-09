@@ -104,6 +104,7 @@ public interface OperationDataRepository extends JpaRepository<OperationData, Lo
             @Param("taskId") Long taskId
     );
 
+    List<OperationData> findAllByDateBetween(LocalDate startDate, LocalDate endDate);
 
     List<OperationData> findByCategoryIdAndSeamstressIdAndDateBetween(Long categoryId, Long seamstressId, LocalDate startDate, LocalDate endDate);
 }

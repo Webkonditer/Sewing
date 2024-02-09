@@ -1,14 +1,16 @@
 package ru.vilas.sewing.service.admin;
 
 import org.springframework.stereotype.Service;
+import ru.vilas.sewing.dto.WorkedOperationDto;
 import ru.vilas.sewing.model.Category;
 import ru.vilas.sewing.model.OperationData;
+import ru.vilas.sewing.model.Task;
 import ru.vilas.sewing.model.User;
 import ru.vilas.sewing.repository.OperationDataRepository;
 
+import java.time.Duration;
 import java.time.LocalDate;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -83,6 +85,105 @@ public class AdminOperationServiceImpl implements AdminOperationService {
 
             operationDataRepository.save(existingOperation);
         }
+    }
+
+    @Override
+    public List<WorkedOperationDto> findByCategoryListAndSeamstressIdAndDateBetween(List<Category> categories, Long seamstressId, LocalDate startDate, LocalDate endDate) {
+
+        List<OperationData> operations =  operationDataRepository.findAllByDateBetween(startDate, endDate);
+
+        if(seamstressId != null && seamstressId != 0){
+            operations = operations.stream().filter(o -> o.getSeamstress().getId() == seamstressId).toList();
+        }
+
+        operations = operations.stream().filter(operation -> categories.contains(operation.getCategory())).toList();
+
+        Map<TaskAndUser, List<OperationData>> operationGroups = operations.stream()
+                    .collect(Collectors.groupingBy(
+                            operation -> new TaskAndUser(operation.getTask(), operation.getSeamstress())
+                    ));
+
+//        List<WorkedOperationDto> workedOperationDtos = operationGroups.entrySet().stream()
+//                    .map(entry -> createDtoFromGroup(entry.getKey(), entry.getValue(), startDate, endDate))
+//                    .toList();;
+
+        List<WorkedOperationDto> workedOperationDtos = operationGroups.entrySet().stream()
+                .map(entry -> createDtoFromGroup(entry.getKey(), entry.getValue(), startDate, endDate))
+                .sorted(Comparator.comparing(dto -> dto.getTask().getName())) // Сортировка по названию задачи
+                .collect(Collectors.toList());
+
+        return workedOperationDtos;
+    }
+
+    @Override
+    public List<LocalDate> getDatesBetween(LocalDate startDate, LocalDate endDate) {
+        List<LocalDate> dates = new ArrayList<>();
+        LocalDate currentDate = startDate;
+        while (currentDate.isBefore(endDate) || currentDate.equals(endDate)) {
+            dates.add(currentDate);
+            currentDate = currentDate.plusDays(1);
+        }
+        return dates;
+    }
+
+    private WorkedOperationDto createDtoFromGroup(TaskAndUser key, List<OperationData> operations, LocalDate startDate, LocalDate endDate) {
+
+        WorkedOperationDto dto = new WorkedOperationDto();
+
+        // Установка других полей DTO
+        dto.setId(operations.get(0).getId());
+        dto.setTaskType(operations.get(0).getTaskType());
+        dto.setCategory(operations.get(0).getCategory());
+        dto.setTask(key.getTask());
+        dto.setSeamstress(key.getSeamstress());
+        dto.setNormPerShift(dto.getTask().getNormPerShift());
+
+        //Количество выполненных задач по датам
+        List<Integer> operationsByDate = new ArrayList<>();
+        getDatesBetween(startDate, endDate).forEach(d -> {
+            operationsByDate.add(operations.stream().filter(o -> o.getDate().equals(d))
+                    .map(OperationData::getCompletedOperations).findFirst().orElse(0));
+        });
+        dto.setOperations(operationsByDate);
+
+        // Сумма выполненных операций
+        dto.setSumOfOperations(operationsByDate.stream()
+                .mapToInt(o -> o.intValue())
+                .sum());
+
+        // Затраченное время по датам
+        List<LocalDate> dates = getDatesBetween(startDate, endDate);
+        List<Duration> timeByDate = new ArrayList<>();
+        dates.forEach(d -> {
+            Duration durationForDate = operations.stream()
+                    .filter(o -> o.getDate().equals(d))
+                    .map(OperationData::getHoursWorked)
+                    .filter(Objects::nonNull) // Фильтруем, чтобы исключить null значения
+                    .reduce(Duration::plus) // Суммируем все Duration для данной даты
+                    .orElse(Duration.ZERO); // Используем Duration.ZERO если нет соответствующих данных
+            timeByDate.add(durationForDate);
+        });
+        // Конвертируем в строку
+        List<String> timeByDateString = timeByDate.stream()
+                .map(t -> String.format("%02d:%02d", t.toHours(), t.toMinutesPart()))
+                .collect(Collectors.toList());
+
+        dto.setDurations(timeByDateString);
+
+
+        // Сумма времени
+        Duration totalDuration = timeByDate.stream()
+                .reduce(Duration.ZERO, Duration::plus);
+        dto.setSumOfTime(formatDuration(totalDuration));
+
+        return dto;
+    }
+
+    // Duration в строку
+    private String formatDuration(Duration duration) {
+        long hours = duration.toHours();
+        int minutes = duration.toMinutesPart();
+        return String.format("%dh %02dm", hours, minutes);
     }
 
 }

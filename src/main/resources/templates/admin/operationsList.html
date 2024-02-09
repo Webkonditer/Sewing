@@ -24,16 +24,19 @@
             <input type="date" id="endDate" name="endDate" class="form-control" required th:value="${endDate}" />
         </div>
 
-        <label for="customerSelect" class="form-label"> Выберите заказчика:</label>
-        <select id="customerSelect" name="customerId" class="form-select">
-            <option value="0" th:selected="${selectedCustomerId eq 0}">Все заказчики</option>
-            <!-- Используем th:each для обработки заказчиков -->
-            <option th:each="customer : ${customers}"
-                    th:value="${customer.id}"
-                    th:text="${customer.name}"
-                    th:selected="${customer.id eq selectedCustomerId}">
-            </option>
-        </select>
+        <!-- Добавляем выпадающий список для выбора заказчика -->
+        <div class="form-group mx-2">
+            <label for="customerSelect" class="form-label"> Выберите заказчика:</label>
+            <select id="customerSelect" name="customerId" class="form-select">
+                <option value="0" th:selected="${selectedCustomerId eq 0}">Все заказчики</option>
+                <!-- Используем th:each для обработки заказчиков -->
+                <option th:each="customer : ${customers}"
+                        th:value="${customer.id}"
+                        th:text="${customer.name}"
+                        th:selected="${customer.id eq selectedCustomerId}">
+                </option>
+            </select>
+        </div>
 
         <!-- Добавляем выпадающий список для выбора категории -->
         <div class="form-group mx-2">
@@ -74,10 +77,10 @@
             <th>Категория</th>
             <th>Задача</th>
             <th>Швея</th>
-            <th th:each="workedByDate : ${workedList[0].workedByDateList}" th:text="${T(java.time.format.DateTimeFormatter).ofPattern('dd.MM.yy').format(workedByDate.date)}"></th>
+            <th>Норма</th>
+            <th th:each="date : ${dates}" th:text="${T(java.time.format.DateTimeFormatter).ofPattern('dd.MM.yy').format(date)}"></th>
 
-           <th>Сумма</th>
-            <!--<th>Количество</th> -->
+            <th>Сумма</th>
             <th>Время</th>
             <th>Действия</th>
 
@@ -85,59 +88,46 @@
         </thead>
         <tbody>
 
-
-        <!-- Используйте th:each для обработки выполненных задач -->
         <tr th:each="operation : ${operations}">
             <td th:text="${operation.taskType.abbreviatedName}"></td>
             <td th:text="${operation.category.name}"></td>
             <td th:text="${operation.task.name}"></td>
             <td th:text="${operation.seamstress.name}"></td>
+            <td th:text="${operation.taskType.abbreviatedName != 'Час-я'} ? ${operation.normPerShift} : 'N/A'"></td>
 
-           <td th:if="${operation.taskType.abbreviatedName == 'Кол-я'}"
-                th:each="workedByDate : ${workedList[0].workedByDateList}"
-                th:text="${workedByDate.quantitativeWorked}"></td>
-
-            <td th:if="${operation.taskType.abbreviatedName == 'Час-я'}"
-                th:each="workedByDate : ${workedList[0].workedByDateList}"
-                th:text="0"></td>
-            <td th:if="${operation.taskType.abbreviatedName == 'Уп-ка'}"
-                th:each="workedByDate : ${workedList[0].workedByDateList}"
-                th:text="0"></td>
-
-            <td th:if="${operation.taskType.abbreviatedName == 'Кол-я'}"
-                th:text="сумма"></td>
-            <td th:if="${operation.taskType.abbreviatedName == 'Час-я'}"
-                th:text="0"></td>
-            <td th:if="${operation.taskType.abbreviatedName == 'Уп-ка'}"
-                th:text="0"></td>
-
-            <td th:if="${operation.hoursWorked != null}">
-
-                <script th:inline="javascript">
-                    var totalSeconds = [[${operation.hoursWorked.toMillis() / 1000}]];
-                    var hours = Math.floor(totalSeconds / 3600);
-                    var minutes = Math.floor((totalSeconds % 3600) / 60);
-                    var formattedDuration = ('0' + hours).slice(-2) + ':' + ('0' + minutes).slice(-2);
-                    document.write(formattedDuration);
-                </script>
+            <!-- Если задача количественная -->
+            <td th:if="${operation.taskType.abbreviatedName != 'Час-я'}" th:each="operationsByDate : ${operation.getOperations()}">
+                <span th:text="${operationsByDate}"></span>
             </td>
-            <td th:if="${operation.hoursWorked == null}">N/A</td>
-            <td>
+            <!-- Если задача часовая -->
+            <td th:if="${operation.taskType.abbreviatedName == 'Час-я'}" th:each="duration : ${operation.getDurations()}">
+                <span th:text="${duration}"></span>
+            </td>
+            <td th:text="${operation.taskType.abbreviatedName != 'Час-я'} ? ${operation.sumOfOperations} : 'N/A'"></td>
+            <td th:text="${operation.taskType.abbreviatedName == 'Час-я'} ? ${operation.sumOfTime} : 'N/A'"></td>
 
-                <span th:if="${startDate == endDate && startDate == operation.date}">
-
+            <!-- Проверяем, выбрана ли только одна дата -->
+            <td th:if="${#lists.size(dates) == 1}">
                 <a th:href="@{'/admin/operations/edit/' + ${operation.id}}" class="btn btn-warning btn-sm">
-                    Edit
+                    Редактировать
                 </a>
-                    <!-- Добавляем атрибут data-bs-toggle и data-bs-target для модального окна -->
                 <a href="#" class="btn btn-danger btn-sm"
                    data-bs-toggle="modal"
                    th:attr="data-bs-target='#deleteModal' + ${operation.id}">
-                    Del
+                    Удалить
                 </a>
-                </span>
-                <span th:unless="${startDate == endDate && startDate == operation.date}">N/A</span>
             </td>
+            <!-- Если выбрано несколько дат, кнопки делаем неактивными -->
+            <td th:unless="${#lists.size(dates) == 1}">
+                <button class="btn btn-warning btn-sm" disabled>
+                    Редактировать
+                </button>
+                <button class="btn btn-danger btn-sm" disabled>
+                    Удалить
+                </button>
+            </td>
+
+        </tr>
 
         </tr>
         </tbody>

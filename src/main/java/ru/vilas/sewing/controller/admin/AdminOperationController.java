@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.vilas.sewing.dto.TaskTypes;
 import ru.vilas.sewing.dto.WorkedByDate;
 import ru.vilas.sewing.dto.WorkedDto;
+import ru.vilas.sewing.dto.WorkedOperationDto;
 import ru.vilas.sewing.model.*;
 import ru.vilas.sewing.repository.OperationDataRepository;
 import ru.vilas.sewing.service.*;
@@ -57,12 +58,11 @@ public class AdminOperationController {
 
     @GetMapping
     public String showOperationsPage(Model model,
-                                     @RequestParam(name = "categoryId", required = false) Long categoryId,
-                                     @RequestParam(name = "seamstressId", required = false) Long seamstressId,
-                                     @RequestParam(name = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-                                     @RequestParam(name = "customerId", required = false) Long customerId,
-                                     @RequestParam(name = "category", required = false) Category category,
-                                     @RequestParam(name = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+                 @RequestParam(name = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+                 @RequestParam(name = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+                 @RequestParam(name = "customerId", required = false) Long customerId,
+                 @RequestParam(name = "){", required = false) Long categoryId,
+                 @RequestParam(name = "seamstressId", required = false) Long seamstressId){
 
         // Если параметры не переданы, устанавливаем значения по умолчанию
         if (endDate == null) {
@@ -72,27 +72,36 @@ public class AdminOperationController {
             startDate = LocalDate.now();
         }
 
-        List<OperationData> operations = operationService.findByCategoryIdAndSeamstressIdAndDateBetween(categoryId, seamstressId, startDate, endDate);
-        List<Category> categories = categoryService.getAllCategories();
+        //Собираем лист категорий в зависимости от фильтров
+        List<Category> allCategories = categoryService.getAllCategories();
+        List<Category> categories = new ArrayList<>();
+        if (customerId == null && categoryId == null) {
+            categories = allCategories;
+        } else if (customerId != null && categoryId == null) {
+            categories = allCategories.stream().filter(c -> Objects.equals(c.getCustomer().getId(), customerId)).toList();
+        } else {
+            categories.add(categoryService.getCategoryById(categoryId));
+        }
+
+        List<WorkedOperationDto> operations = operationService.findByCategoryListAndSeamstressIdAndDateBetween(categories, seamstressId, startDate, endDate);
+
         List<User> seamstresses = userService.getAllSeamstresses();
         List<Customer> customers = customerService.getAllCustomers();
         customers.sort(Comparator.comparing(Customer::getName, String.CASE_INSENSITIVE_ORDER));
 
-        List<WorkedDto> workedDtoList = operationsListSpecialService.getWorkedDtosList(startDate,endDate);
+        model.addAttribute("dates", operationService.getDatesBetween(startDate, endDate));
+        model.addAttribute("operations", operations);
 
-
-        System.out.println("!!!!workedDtoList" + workedDtoList.toString());
-
+        model.addAttribute("customers", customers);
         model.addAttribute("categories", categories);
         model.addAttribute("seamstresses", seamstresses);
-        model.addAttribute("operations", operations);
+
+        model.addAttribute("selectedCustomerId", customerId);
         model.addAttribute("selectedCategoryId", categoryId);
         model.addAttribute("selectedSeamstressId", seamstressId);
         model.addAttribute("startDate", startDate);
         model.addAttribute("endDate", endDate);
-        model.addAttribute("customers", customers); // Добавлено
-        model.addAttribute("selectedCustomerId", customerId); // Добавлено
-        model.addAttribute("workedList", workedDtoList);
+
 
         return "admin/operationsList";
     }
