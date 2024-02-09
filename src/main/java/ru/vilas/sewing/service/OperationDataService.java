@@ -32,4 +32,6 @@ public interface OperationDataService {
 
     List<WorkedDto> getWorkedDtosList(LocalDate startDate, LocalDate endDate);
     SeamstressDto getSeamstressDto(LocalDate startDate, LocalDate endDate);
+
+
 }

@@ -16,7 +16,9 @@ import ru.vilas.sewing.service.CustomUserDetailsService;
 import ru.vilas.sewing.service.OperationDataService;
 
 import java.math.BigDecimal;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -27,12 +29,12 @@ public class OneSeamstressController {
 
     private final OperationDataService operationDataService;
     private final CategoryServiceImpl categoryService;
-    private final CustomUserDetailsService сustomUserDetailsService;
+    private final CustomUserDetailsService customUserDetailsService;
 
-    public OneSeamstressController(OperationDataService operationDataService, CategoryServiceImpl categoryService, CustomUserDetailsService сustomUserDetailsService) {
+    public OneSeamstressController(OperationDataService operationDataService, CategoryServiceImpl categoryService, CustomUserDetailsService customUserDetailsService) {
         this.operationDataService = operationDataService;
         this.categoryService = categoryService;
-        this.сustomUserDetailsService = сustomUserDetailsService;
+        this.customUserDetailsService = customUserDetailsService;
 
     }
 
@@ -41,7 +43,8 @@ public class OneSeamstressController {
     public String getSeamstressReport(
             @RequestParam(name = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(name = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
-            @RequestParam(name = "category", required = false) Long category, Authentication authentication,
+            @RequestParam(name = "category", required = false) Long category,
+            Authentication authentication,
             Model model) {
 
         Object principal =  authentication.getPrincipal();
@@ -53,13 +56,14 @@ public class OneSeamstressController {
         }
 
         // Получаем идентификатор пользователя
-        Long currentUserId = сustomUserDetailsService.getUserIdByUsername(userName);
+        Long currentUserId = customUserDetailsService.getUserIdByUsername(userName);
 
 
         // Если параметры не переданы, устанавливаем значения по умолчанию
         if (endDate == null) {
-            endDate = LocalDate.now();
+            endDate = LocalDate.now().with(DayOfWeek.THURSDAY);
         }
+
         if (startDate == null) {
             startDate = endDate.minusDays(6);
         }
@@ -72,12 +76,20 @@ public class OneSeamstressController {
                 .filter(Category::isActive)
                 .collect(Collectors.toList());
 
-        List<EarningsDto> earningsDtos = operationDataService.getEarningsDtosList(startDate, endDate);
+        List<Category> categoryList = new ArrayList<>();
+        if(category != null && category != 0){
+            categoryList.add(categoryService.getCategoryById(category));
+        } else {
+            categoryList = categories;
+        }
+
+
+        List<EarningsDto> earningsDtos = operationDataService.getEarningsDtosList(startDate, endDate, categoryList);
 
         List<EarningsDto> earningsDtosList;
 
         if (category == null || category == 0) {
-            earningsDtosList = operationDataService.getСommonEarningsDtosList(startDate, endDate);
+            earningsDtosList = operationDataService.getCommonEarningsDtosList(startDate, endDate);
         } else {
             earningsDtosList = earningsDtos.stream().filter(dto -> dto.getCategory().getId().equals(category))
                     .collect(Collectors.toList());

@@ -106,7 +106,6 @@ public class EarningsController {
             earningsDtosList = operationDataService.getEarningsDtosList(startDate, endDate, categoryList);
         }
 
-        System.out.println("!!!!!!!!!!!!! " + categoryList);
         categoryList = null;
 
         BigDecimal salarySum = earningsDtosList.stream()
