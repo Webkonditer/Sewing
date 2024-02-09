@@ -60,9 +60,9 @@ public class AdminOperationController {
     public String showOperationsPage(Model model,
                  @RequestParam(name = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
                  @RequestParam(name = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
-                 @RequestParam(name = "customerId", required = false) Long customerId,
-                 @RequestParam(name = "){", required = false) Long categoryId,
-                 @RequestParam(name = "seamstressId", required = false) Long seamstressId){
+                 @RequestParam(name = "customer", required = false) Long customerId,
+                 @RequestParam(name = "category", required = false) Long categoryId,
+                 @RequestParam(name = "seamstress", required = false) Long seamstressId){
 
         // Если параметры не переданы, устанавливаем значения по умолчанию
         if (endDate == null) {
@@ -75,9 +75,9 @@ public class AdminOperationController {
         //Собираем лист категорий в зависимости от фильтров
         List<Category> allCategories = categoryService.getAllCategories();
         List<Category> categories = new ArrayList<>();
-        if (customerId == null && categoryId == null) {
+        if ((customerId == null || customerId == 0) && (categoryId == null || categoryId == 0)) {
             categories = allCategories;
-        } else if (customerId != null && categoryId == null) {
+        } else if (customerId != null && customerId != 0 && (categoryId == null || categoryId == 0)) {
             categories = allCategories.stream().filter(c -> Objects.equals(c.getCustomer().getId(), customerId)).toList();
         } else {
             categories.add(categoryService.getCategoryById(categoryId));
@@ -93,7 +93,7 @@ public class AdminOperationController {
         model.addAttribute("operations", operations);
 
         model.addAttribute("customers", customers);
-        model.addAttribute("categories", categories);
+        model.addAttribute("categories", allCategories);
         model.addAttribute("seamstresses", seamstresses);
 
         model.addAttribute("selectedCustomerId", customerId);
