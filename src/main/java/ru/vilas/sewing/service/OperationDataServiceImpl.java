@@ -31,6 +31,7 @@ public class OperationDataServiceImpl implements OperationDataService {
         this.taskRepository = taskRepository;
         this.categoryService = categoryService;
         this.customUserDetailsService = customUserDetailsService;
+
     }
     @Override
     public void saveOperationData(OperationData operationData) {
@@ -88,7 +89,7 @@ public class OperationDataServiceImpl implements OperationDataService {
             // Получаем задачи
             Task task = taskRepository.getReferenceById(inoperationDto.getTaskId());
 
-            // Проверяем, не обнулил ли пользователь количество опереций по задаче.
+            // Проверяем, не обнулил ли пользователь количество операций по задаче.
             if (inoperationDto.getOperations() == 0 && !task.getTaskType().equals(HOURLY)) {
                 if (operationDataRepository.existsByTaskAndSeamstressAndDate(task, user, LocalDate.now())){
                     operationDataRepository.deleteByTaskAndSeamstressAndDate(task, user, LocalDate.now());
@@ -104,7 +105,7 @@ public class OperationDataServiceImpl implements OperationDataService {
                 continue;
             }
 
-            // Если запись за текщие сутки существует, обновляем ее.
+            // Если запись за текущие сутки существует, обновляем ее.
             if (operationDataRepository.existsByTaskAndSeamstressAndDate(task, user, LocalDate.now())){
                 operationDataRepository.updateCompletedOperationsAndHoursWorkedByTaskAndSeamstressAndDate(
                         task, user, LocalDate.now(), inoperationDto.getOperations(),
@@ -160,47 +161,51 @@ public class OperationDataServiceImpl implements OperationDataService {
     }
 
     @Override
-    public List<EarningsDto> getEarningsDtosList(LocalDate startDate, LocalDate endDate) {
+    public List<EarningsDto> getEarningsDtosList(LocalDate startDate, LocalDate endDate, List<Category> categories) {
 
         List<User> users = customUserDetailsService.getAllUsers();
         List<EarningsDto> earningsDtos = new ArrayList<>();
-        List<Category> categories = categoryService.getAllCategories()
-                .stream()
-                .filter(Category::isActive) // Фильтрация по активным категориям
-                .toList();
         for (User user: users) {
             if (user.getRoles().stream().anyMatch(role -> !role.getName().equals("ROLE_USER"))) {
                 continue;
             }
 
-            for (Category category : categories) {
-                EarningsDto earningsDto = new EarningsDto();
 
-                earningsDto.setSeamstressId(user.getId());
-                earningsDto.setSeamstressName(user.getName());
-                earningsDto.setCategory(category);
-                earningsDto.setPaymentsByDateList(getPaymentsByDateList(startDate, endDate, user.getId(), category));
-                earningsDto.setTotalAmount(
-                        earningsDto.getPaymentsByDateList().stream()
-                        .map(PaymentsByDate::getQuantitativePayments)
-                        .reduce(BigDecimal.ZERO, BigDecimal::add)
-                        .add(earningsDto.getPaymentsByDateList().stream()
-                                .map(PaymentsByDate::getHourlyPayments)
-                                .reduce(BigDecimal.ZERO, BigDecimal::add))
-                        .add(earningsDto.getPaymentsByDateList().stream()
-                                .map(PaymentsByDate::getPackagingPayments)
-                                .reduce(BigDecimal.ZERO, BigDecimal::add))
-                );
+            EarningsDto earningsDto = new EarningsDto();
 
-                earningsDtos.add(earningsDto);
+            earningsDto.setSeamstressId(user.getId());
+            earningsDto.setSeamstressName(user.getName());
+            //earningsDto.setCategory(category);
+            earningsDto.setPaymentsByDateList(getPaymentsByDateList(startDate, endDate, user.getId(), categories));
+            earningsDto.setTotalAmount(
+                    earningsDto.getPaymentsByDateList().stream()
+                    .map(PaymentsByDate::getQuantitativePayments)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add)
+                    .add(earningsDto.getPaymentsByDateList().stream()
+                            .map(PaymentsByDate::getHourlyPayments)
+                            .reduce(BigDecimal.ZERO, BigDecimal::add))
+                    .add(earningsDto.getPaymentsByDateList().stream()
+                            .map(PaymentsByDate::getPackagingPayments)
+                            .reduce(BigDecimal.ZERO, BigDecimal::add))
+            );
+
+            if (user.getSalary() != null && user.getSalary().compareTo(BigDecimal.ZERO) != 0 && !earningsDto.getPaymentsByDateList().isEmpty()) {
+                earningsDto.setSalary(user.getSalary().divide(new BigDecimal("21"), 2, RoundingMode.HALF_UP).multiply(new BigDecimal(earningsDto.getPaymentsByDateList().size())).setScale(2, RoundingMode.HALF_UP));
+            } else {
+                earningsDto.setSalary(new BigDecimal("0.00"));
             }
+
+            earningsDto.setResult(earningsDto.getTotalAmount().subtract(earningsDto.getSalary()).setScale(2, RoundingMode.HALF_UP));
+
+            earningsDtos.add(earningsDto);
         }
+
 
         return earningsDtos;
     }
 
     @Override
-    public List<EarningsDto> getСommonEarningsDtosList(LocalDate startDate, LocalDate endDate) {
+    public List<EarningsDto> getCommonEarningsDtosList(LocalDate startDate, LocalDate endDate) {
         List<User> users = customUserDetailsService.getAllUsers();
         List<EarningsDto> earningsDtos = new ArrayList<>();
 
@@ -248,8 +253,10 @@ public class OperationDataServiceImpl implements OperationDataService {
         return earningsDtos;
     }
 
-    private List<PaymentsByDate> getPaymentsByDateList(LocalDate startDate, LocalDate endDate, Long seamstressId, Category category) {
-        List<OperationData> operationDataList = operationDataRepository.findBetweenDatesAndBySeamstressAndCategory(startDate, endDate, seamstressId, category);
+
+    private List<PaymentsByDate> getPaymentsByDateList(LocalDate startDate, LocalDate endDate, Long seamstressId, List<Category> categories) {
+        List<OperationData> operationDataList = operationDataRepository.findBetweenDatesAndBySeamstressAndCategories(startDate, endDate, seamstressId, categories);
+
 
         List<PaymentsByDate> paymentsByDateList = new ArrayList<>();
 

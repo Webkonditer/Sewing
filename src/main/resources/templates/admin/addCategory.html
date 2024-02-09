@@ -16,6 +16,12 @@
             <label for="name" class="form-label">Название категории</label>
             <input type="text" class="form-control" id="name" name="name" th:value="${category.name}" required/>
         </div>
+        <div class="mb-3">
+            <label for="customer" class="form-label">Выберите заказчика</label>
+            <select class="form-select" id="customer" name="customer.id" required>
+                <option th:each="customer : ${customers}" th:value="${customer.id}" th:text="${customer.name}"></option>
+            </select>
+        </div>
         <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
         <button type="submit" class="btn btn-primary">Сохранить</button>
     </form>

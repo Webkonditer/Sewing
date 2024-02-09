@@ -30,14 +30,14 @@ public class OperationDataController {
     private final OperationDataService operationDataService;
     private final CategoryService categoryService;
     private final TaskService taskService;
-    private final CustomUserDetailsService сustomUserDetailsService;
+    private final CustomUserDetailsService customUserDetailsService;
 
     @Autowired
-    public OperationDataController(OperationDataService operationDataService, CategoryService categoryService, TaskService taskService, CustomUserDetailsService сustomUserDetailsService) {
+    public OperationDataController(OperationDataService operationDataService, CategoryService categoryService, TaskService taskService, CustomUserDetailsService customUserDetailsService) {
         this.operationDataService = operationDataService;
         this.categoryService = categoryService;
         this.taskService = taskService;
-        this.сustomUserDetailsService = сustomUserDetailsService;
+        this.customUserDetailsService = customUserDetailsService;
     }
 
 //    @PostMapping("/save")
@@ -64,7 +64,7 @@ public class OperationDataController {
         }
 
         // Получаем идентификатор пользователя
-        Long currentUserId = сustomUserDetailsService.getUserIdByUsername(userName);
+        Long currentUserId = customUserDetailsService.getUserIdByUsername(userName);
 
         Category category = categoryService.getCategoryById(categoryId);
         List<Task> tasks = taskService.getTasksByCategory(category);
@@ -82,14 +82,12 @@ public class OperationDataController {
         List<OperationDto> hourlyTasks = operationDtos.stream().filter(t -> t.getTaskType().equals(HOURLY)).toList();
         List<OperationDto> packagingTasks = operationDtos.stream().filter(t -> t.getTaskType().equals(PACKAGING)).toList();
 
-        BigDecimal hourlyRate = сustomUserDetailsService.getCurrentUser().getHourlyRate();
+        BigDecimal hourlyRate = customUserDetailsService.getCurrentUser().getHourlyRate();
 
         model.addAttribute("quantitativeTasks", quantitativeTasks);
         model.addAttribute("hourlyTasks", hourlyTasks);
         model.addAttribute("packagingTasks", packagingTasks);
         model.addAttribute("hourlyRate", hourlyRate);
-
-
 
         return "tasks";
     }

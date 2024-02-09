@@ -4,29 +4,23 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 import java.io.Serializable;
-import java.util.HashSet;
 import java.util.Set;
 
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class Category implements Serializable {
+public class Customer implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String name;
 
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
-    private Set<Task> tasks;
-
-    @ManyToOne
-    @JoinColumn(name = "customer_id", nullable = false)
-    private Customer customer;
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
+    private Set<Category> categories;
 
     private Boolean active = true;
 
@@ -34,4 +28,3 @@ public class Category implements Serializable {
         return active;
     }
 }
-

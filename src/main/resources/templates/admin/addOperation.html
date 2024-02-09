@@ -89,9 +89,9 @@
         <div class="mb-3">
             <!--            //th:value="${task.hours}" // th:value="${task.minutes}"-->
             <label for="hoursWorked" class="form-label">Затрачено времени</label><br>
-            <input type="number" style="width: 45px;" id="hoursWorked" name="hours" onchange="markChangesBeforeSubmit();" required/>
+            <input type="number" style="width: 45px;" id="hoursWorked" name="hours" onchange="markChangesBeforeSubmit();" value="0" required/>
             <span> : </span>
-            <input type="number" style="width: 45px;" id="minutesWorked" name="minutes" onchange="markChangesBeforeSubmit();" required step="5"/>
+            <input type="number" style="width: 45px;" id="minutesWorked" name="minutes" onchange="markChangesBeforeSubmit();" value="0" required step="5"/>
             <input type="hidden" id="hoursWorkedHidden" name="hoursWorked" />
         </div>
 

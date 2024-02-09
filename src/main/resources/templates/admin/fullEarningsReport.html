@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="ru" xmlns:th="http://www.thymeleaf.org">
-
 <head th:replace="~{fragments/headFragment}"></head>
-
 <body>
 
 <div th:replace="~{fragments/headerFragment}"></div>
@@ -23,14 +21,21 @@
             <input type="date" id="endDate" name="endDate" class="form-control" required th:value="${endDate}" />
         </div>
 
-        <!-- Добавляем выпадающий список для выбора категории -->
+        <!-- Выпадающий список для выбора заказчика -->
+        <div class="form-group mx-2">
+            <label for="customer">Заказчик:</label>
+            <select id="customer" name="customer" class="form-control" onchange="updateCategoryList()">
+                <option value="0" th:selected="${selectedCustomerId eq 0}">Все заказчики</option>
+                <option th:each="customer : ${customers}" th:value="${customer.id}" th:text="${customer.name}" th:selected="${customer.id eq selectedCustomerId}"></option>
+            </select>
+        </div>
+
+        <!-- Выпадающий список для выбора категории -->
         <div class="form-group mx-2">
             <label for="category">Категория:</label>
             <select id="category" name="category" class="form-control">
                 <option value="0" th:selected="${selectedCategoryId eq 0}">Все категории</option>
-                <!-- Используем Thymeleaf для генерации опций категорий -->
-                <option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}"
-                        th:selected="${category.id eq selectedCategoryId}"></option>
+                <option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}" th:data-customer-id="${category.customer.id}" th:selected="${category.id eq selectedCategoryId}"></option>
             </select>
         </div>
 
@@ -39,53 +44,43 @@
         </div>
     </form>
 
-    <!-- Добавляем условие для показа таблицы в зависимости от выбранной категории -->
+    <!-- Таблица для отображения данных -->
     <table class="table table-bordered">
         <thead>
         <tr>
             <th style="width: 100px;">Имя швеи</th>
             <th>Тип</th>
-            <!-- Используем Thymeleaf для генерации заголовков дат -->
-            <th th:each="paymentByDate : ${earningsList[0].paymentsByDateList}" th:text="${T(java.time.format.DateTimeFormatter).ofPattern('dd.MM.yy').format(paymentByDate.date)}"></th>
+            <th th:each="paymentByDate : ${earningsList[0].paymentsByDateList}"
+                th:text="${T(java.time.format.DateTimeFormatter).ofPattern('dd.MM.yy').format(paymentByDate.date)}"></th>
             <th>Общая сумма</th>
         </tr>
         </thead>
         <tbody>
-        <!-- Используем Thymeleaf для генерации строк -->
         <th:block th:each="earningsDto : ${earningsList}">
             <tr>
                 <td rowspan="3" class="fw-bold" th:text="${earningsDto.seamstressName}"></td>
                 <td>Кол-е</td>
-                <!-- Используем Thymeleaf для генерации данных PaymentsByDate -->
                 <td th:each="paymentByDate : ${earningsDto.paymentsByDateList}" th:text="${paymentByDate.quantitativePayments}"></td>
                 <td rowspan="3" class="fw-bold">
                     <div th:text="${earningsDto.totalAmount}"></div>
                     <div th:text="'- ' + ${earningsDto.salary}"></div>
                     <div th:text="'= ' + ${earningsDto.result}"></div>
                 </td>
-
             </tr>
             <tr>
                 <td>Вр-е</td>
-                <!-- Используем Thymeleaf для генерации данных PaymentsByDate -->
                 <td th:each="paymentByDate : ${earningsDto.paymentsByDateList}" th:text="${paymentByDate.hourlyPayments}"></td>
-
             </tr>
             <tr>
                 <td>Уп-ка</td>
-                <!-- Используем Thymeleaf для генерации данных PaymentsByDate -->
                 <td th:each="paymentByDate : ${earningsDto.paymentsByDateList}" th:text="${paymentByDate.packagingPayments}"></td>
-
             </tr>
-
-
         </th:block>
-
         </tbody>
         <tfoot>
         <tr>
             <td></td>
-            <th th:each="paymentByDate : ${earningsList[0].paymentsByDateList}" ></th>
+            <th th:each="paymentByDate : ${earningsList[0].paymentsByDateList}"></th>
             <td class="fw-bold">Итого:</td>
             <td class="fw-bold">
                 <div th:text="${salarySum} + ' (оклады)'"></div>
@@ -96,6 +91,35 @@
         </tfoot>
     </table>
 </div>
+
+
+<script>
+    var originalCategories = []; // Список для сохранения всех категорий
+
+    document.addEventListener('DOMContentLoaded', function () {
+        var categorySelect = document.getElementById('category');
+        originalCategories = Array.from(categorySelect.options); // Сохраняем все категории при загрузке страницы
+        var customerSelect = document.getElementById('customer');
+        updateCategoryList();
+        customerSelect.addEventListener('change', updateCategoryList);
+    });
+
+    function updateCategoryList() {
+        var customerSelect = document.getElementById('customer');
+        var categorySelect = document.getElementById('category');
+        var selectedCustomerId = customerSelect.value;
+
+        // Очищаем список категорий
+        categorySelect.innerHTML = '<option value="0">Все категории</option>';
+
+        // Фильтруем категории в зависимости от выбранного заказчика
+        originalCategories.forEach(function(categoryOption) {
+            if (categoryOption.getAttribute('data-customer-id') === selectedCustomerId || selectedCustomerId === '0') {
+                categorySelect.appendChild(categoryOption.cloneNode(true));
+            }
+        });
+    }
+</script>
 
 </body>
 </html>

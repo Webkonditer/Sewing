@@ -10,39 +10,37 @@
 <br/><br/>
 
 <div class="container">
-    <h2>Категории</h2>
+    <h2>Заказчики</h2>
     <table class="table">
         <thead>
         <tr>
-            <th scope="col">Название категории</th>
-            <th scope="col">Заказчик</th>
+            <th scope="col">Наименование заказчика</th>
             <th scope="col"></th>
         </tr>
         </thead>
         <tbody>
-        <tr th:each="category : ${categories}">
-            <td th:text="${category.name}"></td>
-            <td th:text="${category.customer.name}"></td>
+        <tr th:each="customer : ${customers}">
+            <td th:text="${customer.name}"></td>
             <td>
-                <a th:href="@{/admin/categories/edit/{id}(id=${category.id})}" class="btn btn-warning btn-sm">
+                <a th:href="@{/admin/customers/edit/{id}(id=${customer.id})}" class="btn btn-warning btn-sm">
                     Edit
                 </a>
                 <!-- Добавляем атрибут data-bs-toggle и data-bs-target для модального окна -->
                 <a href="#" class="btn btn-danger btn-sm"
                    data-bs-toggle="modal"
-                   th:attr="data-bs-target='#deleteModal' + ${category.id}">
+                   th:attr="data-bs-target='#deleteModal' + ${customer.id}">
                     Del
                 </a>
             </td>
         </tr>
         </tbody>
     </table>
-    <a th:href="@{/admin/categories/new}" class="btn btn-primary">Добавить новую категорию</a>
+    <a th:href="@{/admin/customers/new}" class="btn btn-primary">Добавить нового заказчика</a>
 </div>
 
 <!-- Модальное окно для подтверждения удаления -->
-<div th:each="category : ${categories}">
-    <div th:attr="id='deleteModal' + ${category.id}" class="modal fade" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+<div th:each="customer : ${customers}">
+    <div th:attr="id='deleteModal' + ${customer.id}" class="modal fade" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -51,11 +49,11 @@
                 </div>
                 <div class="modal-body">
                     <!-- Ваш текст подтверждения удаления -->
-                    Уверены, что хотите удалить категорию?
+                    Уверены, что хотите удалить заказчика?
                 </div>
                 <div class="modal-footer">
                     <!-- Кнопка для подтверждения удаления -->
-                    <a th:href="@{/admin/categories/delete/{id}(id=${category.id})}" class="btn btn-danger">Удалить</a>
+                    <a th:href="@{/admin/customers/delete/{id}(id=${customer.id})}" class="btn btn-danger">Удалить</a>
                     <!-- Кнопка для закрытия модального окна -->
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
                 </div>

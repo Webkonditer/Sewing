@@ -56,8 +56,6 @@ public class WorkedOutController {
 
         List<WorkedDto> workedDtosList;
 
-
-
         if (category == null) {
             workedDtosList = workedDtos.stream().filter(dto -> dto.getCategory().getId().equals(categories.get(0).getId()))
                     .collect(Collectors.toList());

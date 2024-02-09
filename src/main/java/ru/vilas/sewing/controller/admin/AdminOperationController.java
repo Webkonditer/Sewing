@@ -1,29 +1,33 @@
 package ru.vilas.sewing.controller.admin;
 
 import jakarta.validation.Valid;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import ru.vilas.sewing.model.Category;
-import ru.vilas.sewing.model.OperationData;
-import ru.vilas.sewing.model.Task;
-import ru.vilas.sewing.model.User;
-import ru.vilas.sewing.service.CategoryService;
+import ru.vilas.sewing.dto.TaskTypes;
+import ru.vilas.sewing.dto.WorkedByDate;
+import ru.vilas.sewing.dto.WorkedDto;
+import ru.vilas.sewing.dto.WorkedOperationDto;
+import ru.vilas.sewing.model.*;
+import ru.vilas.sewing.repository.OperationDataRepository;
+import ru.vilas.sewing.service.*;
 import ru.vilas.sewing.service.admin.AdminCategoryService;
 import ru.vilas.sewing.service.admin.AdminOperationService;
 import ru.vilas.sewing.service.admin.AdminTaskService;
 import ru.vilas.sewing.service.admin.SeamstressService;
 
+import java.time.Duration;
 import java.time.LocalDate;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/admin/operations")
 public class AdminOperationController {
-
+    private final CustomerService customerService;
     private final AdminOperationService operationService;
 
     private final CategoryService categoryService;
@@ -35,22 +39,30 @@ public class AdminOperationController {
     private final AdminTaskService adminTaskService;
 
     private final SeamstressService seamstressService;
+    private final OperationDataService operationDataService;
+    private final OperationsListSpecialServiceImpl operationsListSpecialService;
+    private final OperationDataRepository operationDataRepository;
 
-    public AdminOperationController(AdminOperationService operationService, CategoryService categoryService, SeamstressService userService, AdminCategoryService adminCategoryService, AdminTaskService adminTaskService, SeamstressService seamstressService) {
+    public AdminOperationController(CustomerService customerService, AdminOperationService operationService, CategoryService categoryService, SeamstressService userService, AdminCategoryService adminCategoryService, AdminTaskService adminTaskService, SeamstressService seamstressService, OperationDataService operationDataService, OperationsListSpecialServiceImpl operationsListSpecialService, OperationDataRepository operationDataRepository) {
+        this.customerService = customerService;
         this.operationService = operationService;
         this.categoryService = categoryService;
         this.userService = userService;
         this.adminCategoryService = adminCategoryService;
         this.adminTaskService = adminTaskService;
         this.seamstressService = seamstressService;
+        this.operationDataService = operationDataService;
+        this.operationsListSpecialService = operationsListSpecialService;
+        this.operationDataRepository = operationDataRepository;
     }
 
     @GetMapping
     public String showOperationsPage(Model model,
-                @RequestParam(name = "categoryId", required = false) Long categoryId,
-                @RequestParam(name = "seamstressId", required = false) Long seamstressId,
-                @RequestParam(name = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-                @RequestParam(name = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+                 @RequestParam(name = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+                 @RequestParam(name = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+                 @RequestParam(name = "customer", required = false) Long customerId,
+                 @RequestParam(name = "category", required = false) Long categoryId,
+                 @RequestParam(name = "seamstress", required = false) Long seamstressId){
 
         // Если параметры не переданы, устанавливаем значения по умолчанию
         if (endDate == null) {
@@ -60,17 +72,36 @@ public class AdminOperationController {
             startDate = LocalDate.now();
         }
 
-        List<OperationData> operations = operationService.findByCategoryIdAndSeamstressIdAndDateBetween(categoryId, seamstressId, startDate, endDate);
-        List<Category> categories = categoryService.getAllCategories();
-        List<User> seamstresses = userService.getAllSeamstresses();
+        //Собираем лист категорий в зависимости от фильтров
+        List<Category> allCategories = categoryService.getAllCategories();
+        List<Category> categories = new ArrayList<>();
+        if ((customerId == null || customerId == 0) && (categoryId == null || categoryId == 0)) {
+            categories = allCategories;
+        } else if (customerId != null && customerId != 0 && (categoryId == null || categoryId == 0)) {
+            categories = allCategories.stream().filter(c -> Objects.equals(c.getCustomer().getId(), customerId)).toList();
+        } else {
+            categories.add(categoryService.getCategoryById(categoryId));
+        }
 
-        model.addAttribute("categories", categories);
-        model.addAttribute("seamstresses", seamstresses);
+        List<WorkedOperationDto> operations = operationService.findByCategoryListAndSeamstressIdAndDateBetween(categories, seamstressId, startDate, endDate);
+
+        List<User> seamstresses = userService.getAllSeamstresses();
+        List<Customer> customers = customerService.getAllCustomers();
+        customers.sort(Comparator.comparing(Customer::getName, String.CASE_INSENSITIVE_ORDER));
+
+        model.addAttribute("dates", operationService.getDatesBetween(startDate, endDate));
         model.addAttribute("operations", operations);
+
+        model.addAttribute("customers", customers);
+        model.addAttribute("categories", allCategories);
+        model.addAttribute("seamstresses", seamstresses);
+
+        model.addAttribute("selectedCustomerId", customerId);
         model.addAttribute("selectedCategoryId", categoryId);
         model.addAttribute("selectedSeamstressId", seamstressId);
         model.addAttribute("startDate", startDate);
         model.addAttribute("endDate", endDate);
+
 
         return "admin/operationsList";
     }
