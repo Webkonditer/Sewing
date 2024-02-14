@@ -1,5 +1,6 @@
 package ru.vilas.sewing.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.ToString;
@@ -27,6 +28,7 @@ public class OperationData {
     @ManyToOne
     private Task task;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "seamstress_id", nullable = false)
     private User seamstress;

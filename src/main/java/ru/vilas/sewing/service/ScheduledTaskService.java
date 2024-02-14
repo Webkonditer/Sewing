@@ -10,16 +10,16 @@ import org.springframework.scheduling.annotation.Scheduled;
 public class ScheduledTaskService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ScheduledTaskService.class);
 
-    private final BackupService backupService;
+    private final DatabaseDumpAndSend databaseDumpAndSend;
 
-    public ScheduledTaskService(BackupService backupService) {
-        this.backupService = backupService;
+    public ScheduledTaskService(DatabaseDumpAndSend databaseDumpAndSend) {
+        this.databaseDumpAndSend = databaseDumpAndSend;
     }
 
     @Scheduled(cron = "${task.cron.expression}", zone = "Europe/Moscow")
-    public void performScheduledTask() {
+    public void performScheduledTask() throws Exception {
         LOGGER.info("Scheduled task started.");
-        backupService.createBackupAndSendEmail();
+        DatabaseDumpAndSend.main(null);
         LOGGER.info("Scheduled task completed.");
     }
 }

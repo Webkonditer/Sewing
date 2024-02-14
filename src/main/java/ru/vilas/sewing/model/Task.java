@@ -1,5 +1,6 @@
 package ru.vilas.sewing.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import ru.vilas.sewing.dto.TaskTypes;
@@ -32,6 +33,7 @@ public class Task {
 
     private int normPerShift;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<OperationData> operations;
 

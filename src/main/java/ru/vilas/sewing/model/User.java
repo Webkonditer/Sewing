@@ -1,5 +1,6 @@
 package ru.vilas.sewing.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -28,6 +29,7 @@ public class User {
     BigDecimal hourlyRate;
     BigDecimal salary;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "seamstress", cascade = CascadeType.ALL)
     @ToString.Exclude
     private Set<OperationData> operations;
@@ -37,6 +39,7 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id")
     )
+    @JsonIgnore
     @ToString.Exclude
     private Set<Role> roles;
 }
