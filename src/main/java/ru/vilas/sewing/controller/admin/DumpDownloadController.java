@@ -1,4 +1,4 @@
-package ru.vilas.sewing.controller;
+package ru.vilas.sewing.controller.admin;
 
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -13,10 +13,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Comparator;
-import java.util.Objects;
 
 @Controller
-public class FileDownloadController {
+public class DumpDownloadController {
 
     private static final String BACKUP_FOLDER = "/var/backups/db/";
 
